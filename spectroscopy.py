@@ -142,6 +142,17 @@ def plot_lorentz_data(lorentz_data):
         plt.show()
 
 
+def lorentzian(x,x_0,gamma):
+    return (1/(np.pi*gamma))*((gamma**2)/((x-x_0)**2+(gamma**2)))
+
+
+def lorentzfit():
+    lorentz_data = list(get_lorentz_data(plot=False))
+    for data_out, data_in in lorentz_data:
+        pass
+    print(lorentz_data)
+
+
 def main(argv: list) -> int:
     calibration()
     lorentz_data = list(get_lorentz_data())
@@ -151,3 +162,4 @@ def main(argv: list) -> int:
 
 if __name__ == "__main__":
     main(sys.argv)
+
