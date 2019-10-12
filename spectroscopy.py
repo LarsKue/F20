@@ -1,4 +1,3 @@
-
 import sys
 import math
 import numpy as np
@@ -101,7 +100,8 @@ def get_lorentz_data(plot=True):
     filenames = ["85F2", "85F2fine", "85F3", "85F3fine", "87F1", "87F1fine", "87F2", "87F2fine"]
 
     xlims = [(0.25, 0.28), None, (-0.29, -0.245), None, (0.65, 0.71), None, (0.15, 0.22), None]
-    starting_values = [[-0.3, 0.25, 0.1, 0, 0.6], None, [-0.5, -0.25, 0.1, 0, 0.6], None, [-0.1, 0.7, 0.1, 0, 0.6], None,
+    starting_values = [[-0.3, 0.25, 0.1, 0, 0.6], None, [-0.5, -0.25, 0.1, 0, 0.6], None, [-0.1, 0.7, 0.1, 0, 0.6],
+                       None,
                        [-0.2, 0.2, 0.1, -0.15, 0.6], None]
 
     for filename, xlim, p0 in zip(filenames, xlims, starting_values):
@@ -142,24 +142,45 @@ def plot_lorentz_data(lorentz_data):
         plt.show()
 
 
-def lorentzian(x,x_0,gamma):
-    return (1/(np.pi*gamma))*((gamma**2)/((x-x_0)**2+(gamma**2)))
+def lorentzian(x: np.ndarray, x_0, gamma, a, b):
+    return ((1 / (np.pi * gamma)) * ((gamma ** 2) / ((x - x_0) ** 2 + (gamma ** 2)))) + (a * x + b)
 
 
-def lorentzfit():
-    lorentz_data = list(get_lorentz_data(plot=False))
+def lorentzfit(lorentz_data):
     for data_out, data_in in lorentz_data:
-        pass
-    print(lorentz_data)
+        data_out = np.array(data_out)
+        data_in = np.array(data_in)
+        popt, pcov = curve_fit(lorentzian, data_out, data_in, p0=[0.264, 0.0001, 1, 1])
+        plt.plot(data_out, data_in)
+        plt.plot(data_out, lorentzian(data_out, *popt))
+        plt.show()
+        print(data_out)
+
+    # x = list(range(10))
+    # y = list(reversed(range(3, 23, 2)))
+    #
+    # @np.vectorize
+    # def mask(x):
+    #    return x > 5
+    #
+    # print(x, y)
+    #
+    # x, y = tuple(mask_data(mask, x, y))
+    #
+    # print(x, y)
+
+
+
+
 
 
 def main(argv: list) -> int:
-    calibration()
-    lorentz_data = list(get_lorentz_data())
-    plot_lorentz_data(lorentz_data)
+    # calibration()
+    lorentz_data = list(get_lorentz_data(plot=True))
+    # plot_lorentz_data(lorentz_data)
+    lorentzfit(lorentz_data)
     return 0
 
 
 if __name__ == "__main__":
     main(sys.argv)
-
