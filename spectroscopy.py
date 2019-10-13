@@ -21,12 +21,20 @@ def voltage_to_freq(v):
     return v / dVdf
 
 
-def mask_data(mask: Callable[[List], List], keyarr: List, *data: List[List], modify_keyarr: bool = True):
+def mask_data(mask: Callable[[List], List], keyarr: List, *data: List[List], modify_keyarr: bool = True, output_type_modifier=None):
     m: List = mask(keyarr)
     if modify_keyarr:
-        yield type(keyarr)(x for i, x in enumerate(keyarr) if m[i])
+        result = (x for i, x in enumerate(keyarr) if m[i])
+        if output_type_modifier is None:
+            yield type(keyarr)(result)
+        else:
+            yield output_type_modifier(result)
     for arr in data:
-        yield type(arr)(x for i, x in enumerate(arr) if m[i])
+        result = (x for i, x in enumerate(arr) if m[i])
+        if output_type_modifier is None:
+            yield type(arr)(result)
+        else:
+            yield output_type_modifier(result)
 
 
 def get_data(filename: str):
@@ -101,8 +109,7 @@ def get_lorentz_data(plot=True):
 
     xlims = [(0.25, 0.28), None, (-0.29, -0.245), None, (0.65, 0.71), None, (0.15, 0.22), None]
     starting_values = [[-0.3, 0.25, 0.1, 0, 0.6], None, [-0.5, -0.25, 0.1, 0, 0.6], None, [-0.1, 0.7, 0.1, 0, 0.6],
-                       None,
-                       [-0.2, 0.2, 0.1, -0.15, 0.6], None]
+                       None, [-0.2, 0.2, 0.1, -0.15, 0.6], None]
 
     for filename, xlim, p0 in zip(filenames, xlims, starting_values):
         data_out, data_in, pdh = zip(*list(get_data("data/" + filename + ".txt")))
@@ -142,45 +149,55 @@ def plot_lorentz_data(lorentz_data):
         plt.show()
 
 
-def lorentzian(x: np.ndarray, x_0, gamma):
-    return ((1 / (np.pi * gamma)) * ((gamma ** 2) / ((x - x_0) ** 2 + (gamma ** 2))))
+# def lorentzian(x: np.ndarray, x_0, gamma, a, b):
+#     return a * x + b + (1 / (np.pi * gamma)) * ((gamma ** 2) / ((x - x_0) ** 2 + (gamma ** 2)))
 
 
-def lorentzfit(lorentz_data): #masterdata-Sortierung: 0=85RbF2, 1=85RbF3, 2=87RbF1, 3=87RbF2
-    masterdata_out = []
-    for data_out, data_in in lorentz_data:
-        data_out = np.array(data_out)
-        masterdata_out.append(data_out)
-    masterdata_in = []
-    for data_out, data_in in lorentz_data:
-        data_in = np.array(data_in)
-        masterdata_in.append(data_in)
-    #print(masterdata_out[3][674:687])
-
-    # popt0, pcov0 = curve_fit(lorentzian, masterdata_out[1][392:410], masterdata_in[1][392:410], p0=[-0.2835,0.0001])
-    # plt.plot(masterdata_out[1], masterdata_in[1])
-    # plt.plot(masterdata_out[1][392:410], lorentzian(masterdata_out[1][392:410], *popt0))
-    # plt.show()
-    #print(data_out[392:410])
+def lorentzian(x, x0, gamma, a, b):
+    return a * x + b + (1 / (1 + 4 * (x - x0) ** 2 / gamma ** 2))
 
 
-
-    # x = list(range(10))
-    # y = list(reversed(range(3, 23, 2)))
-    #
-    # @np.vectorize
-    # def mask(x):
-    #    return x > 5
-    #
-    # print(x, y)
-    #
-    # x, y = tuple(mask_data(mask, x, y))
-    #
-    # print(x, y)
+def lorentzfit(lorentz_data):
+    for i in range(len(lorentz_data)):
+        lorentz_data[i] = tuple(np.array(x) for x in lorentz_data[i])
 
 
+    """ HIER WERTE ÄNDERN """
 
+    # die hier sind aus dem PDF
+    mask_ranges = [[(0.252, 0.2575), None, (0.2708, 0.2747)],
+                   [(-0.2856, -0.2827), (-0.2784, -0.2751), (-0.252, -0.248)],
+                   [(0.66, 0.675), (0.68, 0.684), (0.704, 0.7089)], [None, (0.1579, 0.162), (1.2041, 0.2077)]]
 
+    starting_values = [[[0.2555, 0.03, 3.421197, -0.84513], None, None],
+                       [None, None, None],
+                       [None, None, None],
+                       [None, None, None]]
+
+    """ AB HIER NICHT MEHR WERTE ÄNDERN """
+
+    for (data_out, data_in), mask_list, startval_list in zip(lorentz_data, mask_ranges, starting_values):
+        for mask_range, p0 in zip(mask_list, startval_list):
+            if not mask_range:
+                continue
+
+            @np.vectorize
+            def mask(x):
+                return mask_range[0] <= x <= mask_range[1]
+
+            mdata_out, mdata_in = mask_data(mask, data_out, data_in, output_type_modifier=list)
+
+            popt, pcov = curve_fit(lorentzian, mdata_out, mdata_in, p0=p0)
+
+            print(popt)
+
+            plt.plot(data_out, data_in, marker=".")
+            plt.xlim(plt.axes().get_xlim())
+            plt.ylim(plt.axes().get_ylim())
+            x = np.linspace(data_out[0], data_out[-1], 1000)
+            plt.plot(x, lorentzian(x, *popt))
+
+            plt.show()
 
 
 def main(argv: list) -> int:
