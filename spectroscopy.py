@@ -142,19 +142,28 @@ def plot_lorentz_data(lorentz_data):
         plt.show()
 
 
-def lorentzian(x: np.ndarray, x_0, gamma, a, b):
-    return ((1 / (np.pi * gamma)) * ((gamma ** 2) / ((x - x_0) ** 2 + (gamma ** 2)))) + (a * x + b)
+def lorentzian(x: np.ndarray, x_0, gamma):
+    return ((1 / (np.pi * gamma)) * ((gamma ** 2) / ((x - x_0) ** 2 + (gamma ** 2))))
 
 
-def lorentzfit(lorentz_data):
+def lorentzfit(lorentz_data): #masterdata-Sortierung: 0=85RbF2, 1=85RbF3, 2=87RbF1, 3=87RbF2
+    masterdata_out = []
     for data_out, data_in in lorentz_data:
         data_out = np.array(data_out)
+        masterdata_out.append(data_out)
+    masterdata_in = []
+    for data_out, data_in in lorentz_data:
         data_in = np.array(data_in)
-        popt, pcov = curve_fit(lorentzian, data_out, data_in, p0=[0.264, 0.0001, 1, 1])
-        plt.plot(data_out, data_in)
-        plt.plot(data_out, lorentzian(data_out, *popt))
-        plt.show()
-        print(data_out)
+        masterdata_in.append(data_in)
+    #print(masterdata_out[3][674:687])
+
+    # popt0, pcov0 = curve_fit(lorentzian, masterdata_out[1][392:410], masterdata_in[1][392:410], p0=[-0.2835,0.0001])
+    # plt.plot(masterdata_out[1], masterdata_in[1])
+    # plt.plot(masterdata_out[1][392:410], lorentzian(masterdata_out[1][392:410], *popt0))
+    # plt.show()
+    #print(data_out[392:410])
+
+
 
     # x = list(range(10))
     # y = list(reversed(range(3, 23, 2)))
@@ -176,7 +185,7 @@ def lorentzfit(lorentz_data):
 
 def main(argv: list) -> int:
     # calibration()
-    lorentz_data = list(get_lorentz_data(plot=True))
+    lorentz_data = list(get_lorentz_data(plot=False))
     # plot_lorentz_data(lorentz_data)
     lorentzfit(lorentz_data)
     return 0
