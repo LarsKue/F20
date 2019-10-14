@@ -16,12 +16,24 @@ def gaussian(x, amp, mu, sigma, a, b):
     return a * x + b + amp * np.exp(-(x - mu) ** 2 / (2 * sigma ** 2)) / (sigma * np.sqrt(2 * np.pi))
 
 
+# chad function from wikipedia
+def lorentzian(x, x0, gamma, amp, y0, a):
+    return a * x + y0 + amp * gamma ** 2 / (((x - x0) ** 2 + gamma ** 2) * np.pi * gamma)
+
+
+# virgin function from script
+# def lorentzian(x, x0, gamma, amp, y0):
+#     return y0 + (amp / (1 + (4 * (x - x0) ** 2 / gamma ** 2)))
+
+
 def voltage_to_freq(v):
-    dVdf = ufloat(1.9366, 0.0008) * 1e-10
+    dVdf = ufloat(1.9366, 0.0008) * 1e-10  # Rb87
+    # dVdf = ufloat(1.9504, 0.0008) * 1e-10  # Rb85
     return v / dVdf
 
 
-def mask_data(mask: Callable[[List], List], keyarr: List, *data: List[List], modify_keyarr: bool = True, output_type_modifier=None):
+def mask_data(mask: Callable[[List], List], keyarr: List, *data: List[List], modify_keyarr: bool = True,
+              output_type_modifier=None):
     m: List = mask(keyarr)
     if modify_keyarr:
         result = (x for i, x in enumerate(keyarr) if m[i])
@@ -84,18 +96,22 @@ def calibration(plot=True):
         print("P0 {}: {}".format(i, P0))
 
     Rb87F1F2 = 6.834682610904290e9  # Hz
-    # Rb85F2F3 = 3.0357324390e9  # Hz
+    Rb85F2F3 = 3.0357324390e9  # Hz
 
     delta_V = abs(voltages[3] - voltages[0])
 
     dVdf1 = delta_V / Rb87F1F2
 
-    # delta_V = abs(f[2] - f[1])
-    #
-    # dVdf2 = delta_V / Rb85F2F3
+    delta_V = abs(voltages[2] - voltages[1])
+
+    print("Test with literature value for Lorenz:", voltage_to_freq(delta_V) * 1e-9, "GHz")
+    print("Deviation:", 100 * (voltage_to_freq(delta_V) - Rb85F2F3) / Rb85F2F3, "%")
+
+    dVdf2 = delta_V / Rb85F2F3
 
     print("dVdf =", dVdf1)
-    # print("dVdf2 =", dVdf2)
+    # checking result
+    print("dVdf2 =", dVdf2)
 
     if plot:
         plt.xlabel("Aux Out [V]")
@@ -149,32 +165,31 @@ def plot_lorentz_data(lorentz_data):
         plt.show()
 
 
-# def lorentzian(x: np.ndarray, x_0, gamma, a, b):
-#     return a * x + b + (1 / (np.pi * gamma)) * ((gamma ** 2) / ((x - x_0) ** 2 + (gamma ** 2)))
-
-
-def lorentzian(x, x0, gamma, a, b):
-    return a * x + b + (1 / (1 + (4 * (x - x0) ** 2 / gamma ** 2)))
-
-
 def lorentzfit(lorentz_data):
     for i in range(len(lorentz_data)):
         lorentz_data[i] = tuple(np.array(x) for x in lorentz_data[i])
 
-
     """ HIER WERTE ÄNDERN """
 
     # die hier sind aus dem PDF
-    mask_ranges = [[(0.252, 0.2575), None, (0.2708, 0.2747)],
-                   [(-0.2856, -0.2827), (-0.2784, -0.2751), (-0.252, -0.248)],
-                   [(0.66, 0.675), (0.68, 0.684), (0.702, 0.709)], [None, (0.1579, 0.162), (0.2041, 0.2077)]]
+    mask_ranges = [[(0.252, 0.2575), None, (0.2700, 0.2747)],
+                   [(-0.2856, -0.28158), (-0.2785, -0.2745), (-0.2535, -0.2471)],
+                   [(0.66, 0.675), (0.6772, 0.6863), (0.7000, 0.7142)], [None, (0.1551, 0.1665), (0.2022, 0.2119)]]
 
-    starting_values = [[[0.2555, 0.03, 3.421197, -0.84513], None, [0.272,0.03,-3,1]],
-                       [[-0.283,0.03,-3,1], [-0.276,0.03,-3,1], [-0.250,0.03,-3,1]],
-                       [[0.666,0.005,-1,1], None, [0.706,0.003,-1,1]],
-                       [None, [0.160,0.03,-3,1], [0.206,0.03,-3,1]]]
+    # works
+    # starting_values = [[[0.2555, 0.003, 0.03, 0.015], None, [0.272, 0.003, 0.004, 0.021]],
+    #                    [[-0.283, 0.003, 0.009, 0.019], [-0.276, 0.003, 0.005, 0.0275], [-0.250, 0.003, 0.008, 0.02]],
+    #                    [[0.666, 0.005, 0.0065, 0.0028], None, [0.706, 0.003, 0.008, 0.008]],
+    #                    [None, [0.160, 0.003, 0.0065, 0.0035], [0.206, 0.003, 0.02, 0.005]]]
+
+    starting_values = [[[0.2555, 0.003, 0.03, 0.015, 0], None, [0.272, 0.003, 0.004, 0.021, 0]],
+                       [[-0.283, 0.003, 0.009, 0.019, 0], [-0.276, 0.003, 0.005, 0.0275, 0], [-0.250, 0.003, 0.008, 0.02, 0]],
+                       [[0.666, 0.005, 0.0065, 0.0028, 1], None, [0.706, 0.003, 0.008, 0.008, 1]],
+                       [None, [0.160, 0.003, 0.0065, 0.0035, -0.5], [0.206, 0.003, 0.02, 0.005, 0]]]
 
     """ AB HIER NICHT MEHR WERTE ÄNDERN """
+
+    gammas = []
 
     for (data_out, data_in), mask_list, startval_list in zip(lorentz_data, mask_ranges, starting_values):
         for mask_range, p0 in zip(mask_list, startval_list):
@@ -187,17 +202,23 @@ def lorentzfit(lorentz_data):
 
             mdata_out, mdata_in = mask_data(mask, data_out, data_in, output_type_modifier=list)
 
-            popt, pcov = curve_fit(lorentzian, mdata_out, mdata_in, p0=p0)
+            popt, pcov = curve_fit(lorentzian, mdata_out, mdata_in, p0=p0, maxfev=100000)
 
-            print(popt)
+            gamma = ufloat(popt[1], np.sqrt(pcov[1][1]))
+
+            print(voltage_to_freq(gamma) * 1e-6)
+            gammas.append(voltage_to_freq(gamma) * 1e-6)
 
             plt.plot(data_out, data_in, marker=".")
             plt.xlim(plt.axes().get_xlim())
             plt.ylim(plt.axes().get_ylim())
-            x = np.linspace(data_out[0], data_out[-1], 1000)
+            x = np.linspace(data_out[0], data_out[-1], 10000)
             plt.plot(x, lorentzian(x, *popt))
 
             plt.show()
+
+    # for x in gammas:
+    #     print(x)
 
 
 def main(argv: list) -> int:
