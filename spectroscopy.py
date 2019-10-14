@@ -154,7 +154,7 @@ def plot_lorentz_data(lorentz_data):
 
 
 def lorentzian(x, x0, gamma, a, b):
-    return a * x + b + (1 / (1 + 4 * (x - x0) ** 2 / gamma ** 2))
+    return a * x + b + (1 / (1 + (4 * (x - x0) ** 2 / gamma ** 2)))
 
 
 def lorentzfit(lorentz_data):
@@ -167,12 +167,12 @@ def lorentzfit(lorentz_data):
     # die hier sind aus dem PDF
     mask_ranges = [[(0.252, 0.2575), None, (0.2708, 0.2747)],
                    [(-0.2856, -0.2827), (-0.2784, -0.2751), (-0.252, -0.248)],
-                   [(0.66, 0.675), (0.68, 0.684), (0.704, 0.7089)], [None, (0.1579, 0.162), (1.2041, 0.2077)]]
+                   [(0.66, 0.675), (0.68, 0.684), (0.702, 0.709)], [None, (0.1579, 0.162), (0.2041, 0.2077)]]
 
-    starting_values = [[[0.2555, 0.03, 3.421197, -0.84513], None, None],
-                       [None, None, None],
-                       [None, None, None],
-                       [None, None, None]]
+    starting_values = [[[0.2555, 0.03, 3.421197, -0.84513], None, [0.272,0.03,-3,1]],
+                       [[-0.283,0.03,-3,1], [-0.276,0.03,-3,1], [-0.250,0.03,-3,1]],
+                       [[0.666,0.005,-1,1], None, [0.706,0.003,-1,1]],
+                       [None, [0.160,0.03,-3,1], [0.206,0.03,-3,1]]]
 
     """ AB HIER NICHT MEHR WERTE ÄNDERN """
 
