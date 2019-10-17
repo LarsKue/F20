@@ -21,6 +21,11 @@ def lorentzian(x, x0, gamma, amp, y0, a):
     return a * x + y0 + amp * gamma ** 2 / (((x - x0) ** 2 + gamma ** 2) * np.pi * gamma)
 
 
+def modify_data(modifier, *data):
+    for d in data:
+        yield type(d)(modifier(x) for x in d)
+
+
 # virgin function from script
 # def lorentzian(x, x0, gamma, amp, y0):
 #     return y0 + (amp / (1 + (4 * (x - x0) ** 2 / gamma ** 2)))
@@ -30,6 +35,10 @@ def voltage_to_freq(v):
     dVdf = ufloat(1.9366, 0.0008) * 1e-10  # Rb87
     # dVdf = ufloat(1.9504, 0.0008) * 1e-10  # Rb85
     return v / dVdf
+
+
+def u_to_kg(m):
+    return 1.66053904e-27 * m
 
 
 def mask_data(mask: Callable[[List], List], keyarr: List, *data: List[List], modify_keyarr: bool = True,
@@ -120,52 +129,90 @@ def calibration(plot=True):
         plt.show()
 
 
-def get_lorentz_data(plot=True):
-    filenames = ["85F2", "85F2fine", "85F3", "85F3fine", "87F1", "87F1fine", "87F2", "87F2fine"]
+def get_lorentz_data(plot=True, return_temperatures=False):
+    filenames = ["85F2", "85F3", "87F1", "87F2"]
 
-    xlims = [(0.25, 0.28), None, (-0.29, -0.245), None, (0.65, 0.71), None, (0.15, 0.22), None]
-    starting_values = [[-0.3, 0.25, 0.1, 0, 0.6], None, [-0.5, -0.25, 0.1, 0, 0.6], None, [-0.1, 0.7, 0.1, 0, 0.6],
-                       None, [-0.2, 0.2, 0.1, -0.15, 0.6], None]
+    xlims = [(0.25, 0.28), (-0.29, -0.245), (0.65, 0.71), (0.15, 0.22)]
+    starting_values = [[-0.3, 0.25, 0.1, 0, 0.6], [-0.5, -0.25, 0.1, 0, 0.6], [-0.1, 0.7, 0.1, 0, 0.6],
+                       [-0.2, 0.2, 0.1, -0.15, 0.6]]
 
-    for filename, xlim, p0 in zip(filenames, xlims, starting_values):
+    temperatures = []
+    m85 = u_to_kg(84.911789738)
+    m87 = u_to_kg(86.909180527)
+    l = 780e-9  # m
+    nu_0 = consts.c / l  # Hz
+
+    masses = [m85, m85, m87, m87]
+
+    for filename, xlim, p0, m in zip(filenames, xlims, starting_values, masses):
         data_out, data_in, pdh = zip(*list(get_data("data/" + filename + ".txt")))
 
         if plot:
             plt.plot(data_out, data_in, label="Data")
 
-        if xlim:
-            @np.vectorize
-            def mask(x):
-                return x <= xlim[0] or x >= xlim[1]
+        @np.vectorize
+        def mask(x):
+            return x <= xlim[0] or x >= xlim[1]
 
-            mdata_out, mdata_in, mpdh = tuple(mask_data(mask, data_out, data_in, pdh))
+        mdata_out, mdata_in, mpdh = tuple(mask_data(mask, data_out, data_in, pdh))
 
-            popt, pcov = curve_fit(gaussian, mdata_out, mdata_in, p0=p0)
-            x = np.linspace(data_out[0], data_out[-1], 10000)
-            if plot:
-                plt.plot(x, gaussian(x, *popt), color="orange", label="Gaussian Fit")
+        popt, pcov = curve_fit(gaussian, mdata_out, mdata_in, p0=p0)
 
-            lorentzdata = np.array(list(data_in)) - gaussian(np.array(list(data_out)), *popt)
-            yield (data_out, tuple(lorentzdata))
+        sigma = voltage_to_freq(ufloat(popt[2], np.sqrt(pcov[2][2])))
+
+        T = sigma ** 2 * m * consts.c ** 2 / (nu_0 ** 2 * consts.k)
+
+        print("T =", T, "K")
+        temperatures.append(T)
+
+        lorentzdata = np.array(list(data_in)) - gaussian(np.array(list(data_out)), *popt)
+        yield (data_out, tuple(lorentzdata))
 
         if plot:
+            x = np.linspace(data_out[0], data_out[-1], 10000)
+            plt.plot(x, gaussian(x, *popt), color="orange", label="Gaussian Fit")
             plt.xlabel("Aux Out [V]")
             plt.ylabel("Aux In [V]")
             plt.title(filename)
             plt.legend()
             plt.show()
 
-        # if not xlim:
-        #     yield (data_out, data_in)
+    if return_temperatures:
+        return temperatures
 
 
-def plot_lorentz_data(lorentz_data):
-    for data_out, data_in in lorentz_data:
-        plt.plot(data_out, data_in)
-        plt.show()
+def get_hyperfine_data(plot=True):
+    filenames = ["85F2fine", "85F3fine", "87F1fine", "87F2fine"]
+
+    for filename in filenames:
+        data_out, data_in, pdh = zip(*list(get_data("data/" + filename + ".txt")))
+
+        pdh = list(*modify_data(lambda x: -x, pdh))
+
+        yield (data_out, data_in, pdh)
+
+        if plot:
+            fig, ax1 = plt.subplots(figsize=(10, 8))
+            color = "tab:blue"
+            ax1.set_xlabel("Aux Out [V]")
+            ax1.set_ylabel("Aux In [V]", color=color)
+            ax1.plot(data_out, data_in, color=color)
+            ax1.tick_params(axis="y", labelcolor=color)
+
+            ax2 = ax1.twinx()
+
+            color = "tab:green"
+            ax2.set_ylabel("PDH [V]", color=color)
+            ax2.plot(data_out, pdh, color=color)
+            ax2.tick_params(axis="y", labelcolor=color)
+
+            # fig.tight_layout()
+            plt.title(filename)
+            plt.legend()
+            plt.show()
 
 
-def lorentzfit(lorentz_data):
+def lorentzfit(lorentz_data, plot=True, return_gammas=False):
     for i in range(len(lorentz_data)):
         lorentz_data[i] = tuple(np.array(x) for x in lorentz_data[i])
 
@@ -174,7 +221,8 @@ def lorentzfit(lorentz_data):
     # die hier sind aus dem PDF
     mask_ranges = [[(0.252, 0.2575), None, (0.2700, 0.2747)],
                    [(-0.2856, -0.28158), (-0.2785, -0.2745), (-0.2535, -0.2471)],
-                   [(0.66, 0.675), (0.6772, 0.6863), (0.7000, 0.7142)], [None, (0.1551, 0.1665), (0.2022, 0.2119)]]
+                   [(0.66, 0.675), (0.6772, 0.6863), (0.7000, 0.7142)],
+                   [None, (0.1551, 0.1665), (0.2022, 0.2119)]]
 
     # works
     # starting_values = [[[0.2555, 0.003, 0.03, 0.015], None, [0.272, 0.003, 0.004, 0.021]],
@@ -209,23 +257,39 @@ def lorentzfit(lorentz_data):
             print(voltage_to_freq(gamma) * 1e-6)
             gammas.append(voltage_to_freq(gamma) * 1e-6)
 
-            plt.plot(data_out, data_in, marker=".")
-            plt.xlim(plt.axes().get_xlim())
-            plt.ylim(plt.axes().get_ylim())
-            x = np.linspace(data_out[0], data_out[-1], 10000)
-            plt.plot(x, lorentzian(x, *popt))
+            if plot:
+                plt.plot(data_out, data_in, marker=".")
+                plt.xlim(plt.axes().get_xlim())
+                plt.ylim(plt.axes().get_ylim())
+                x = np.linspace(data_out[0], data_out[-1], 10000)
+                plt.plot(x, lorentzian(x, *popt))
 
-            plt.show()
+                plt.show()
 
-    # for x in gammas:
-    #     print(x)
+    if return_gammas:
+        return gammas
+
+
+def hyperfine(plot=True):
+    data = list(get_hyperfine_data(plot=True))
+
+    # for i in range(len(data)):
+    #     data[i] = tuple(np.array(x) for x in data[i])
+    #
+    # for data_in, data_out in data:
+    #     plt.plot(data_in, data_out, label="Data")
+    #     plt.xlabel("Aux Out [V]")
+    #     plt.ylabel("Aux In [V]")
+    #     plt.legend()
+    #     plt.show()
 
 
 def main(argv: list) -> int:
     # calibration()
     lorentz_data = list(get_lorentz_data(plot=False))
     # plot_lorentz_data(lorentz_data)
-    lorentzfit(lorentz_data)
+    lorentzfit(lorentz_data, plot=False)
+    hyperfine()
     return 0
 
 
