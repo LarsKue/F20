@@ -208,7 +208,6 @@ def get_hyperfine_data(plot=True):
 
             # fig.tight_layout()
             plt.title(filename)
-            plt.legend()
             plt.show()
 
 
