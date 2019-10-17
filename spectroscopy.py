@@ -11,6 +11,9 @@ from scipy.stats import chi2
 from typing import Callable, List
 
 
+data_folder = "data/spectroscopy/"
+
+
 # add a linear function f(x) = a * x + b to the gaussian as an offset
 def gaussian(x, amp, mu, sigma, a, b):
     return a * x + b + amp * np.exp(-(x - mu) ** 2 / (2 * sigma ** 2)) / (sigma * np.sqrt(2 * np.pi))
@@ -73,7 +76,7 @@ def calibration(plot=True):
     calib_starting_vals = [[-0.3, -0.5, 0.05, -0.15, 0.6], [-0.4, -0.28, 0.05, 0.1, 0.6], [-0.3, 0.31, 0.05, 0, 0.6],
                            [-0.1, 0.8, 0.05, 0, 0.6]]
 
-    data_out, data_in, pdh = zip(*list(get_data("data/fullspectrum.txt")))
+    data_out, data_in, pdh = zip(*list(get_data(data_folder + "fullspectrum.txt")))
 
     if plot:
         plt.plot(data_out, data_in)
@@ -145,7 +148,7 @@ def get_lorentz_data(plot=True, return_temperatures=False):
     masses = [m85, m85, m87, m87]
 
     for filename, xlim, p0, m in zip(filenames, xlims, starting_values, masses):
-        data_out, data_in, pdh = zip(*list(get_data("data/" + filename + ".txt")))
+        data_out, data_in, pdh = zip(*list(get_data(data_folder + filename + ".txt")))
 
         if plot:
             plt.plot(data_out, data_in, label="Data")
@@ -185,7 +188,7 @@ def get_hyperfine_data(plot=True):
     filenames = ["85F2fine", "85F3fine", "87F1fine", "87F2fine"]
 
     for filename in filenames:
-        data_out, data_in, pdh = zip(*list(get_data("data/" + filename + ".txt")))
+        data_out, data_in, pdh = zip(*list(get_data(data_folder + filename + ".txt")))
 
         pdh = list(*modify_data(lambda x: -x, pdh))
 
@@ -286,7 +289,6 @@ def hyperfine(plot=True):
 def main(argv: list) -> int:
     # calibration()
     lorentz_data = list(get_lorentz_data(plot=False))
-    # plot_lorentz_data(lorentz_data)
     lorentzfit(lorentz_data, plot=False)
     hyperfine()
     return 0
@@ -294,3 +296,6 @@ def main(argv: list) -> int:
 
 if __name__ == "__main__":
     main(sys.argv)
+
+
+
