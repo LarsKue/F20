@@ -21,14 +21,11 @@ def get_data(filename, skip_rows=18, separator=","):
 
 
 def get_all_data():
-    i = 4
-    while True:
+    for i in range(4, 42 + 1):
+        if i == 19:
+            continue
         filename = data_folder + "F{:04d}CH1.csv".format(i)
-        try:
-            yield zip(*list(get_data(filename)))
-        except FileNotFoundError:
-            break
-        i += 1
+        yield zip(*list(get_data(filename)))
 
 
 data_detuning = "data/detuning_coil_curves/"
