@@ -32,6 +32,31 @@ def get_all_data():
         i += 1
 
 
+def conv_volts_to_atomnumber():
+
+    # def intens_0(p_powermeter):
+    #     return (2 * p_powermeter) / (np.pi * ((2E-3) ** 2))
+    #
+    # def gamma_sc(delta):
+    #     gamma = 2*np.pi*6.07E6
+    #     I_sat = 4.1 #milivolts per squarecentimetre
+    #     return (gamma/2) * ((intens_0(p_powermeter)/I_sat)/(1+(intens_0(p_powermeter)/I_sat) + 4 * ((delta ** 2)/gamma ** 2)))
+    #
+    # def wavelength_to_energy(lambda):
+    #     return 6.62607015E-34 * 299792458 / lambda
+    #
+    # def conversion_to_atoms(V_out):
+    #     S = 1E6 / (1E6 + 50)
+    #     T = 0.96
+    #     G = ufloat(4.75E6,4.75E6 * 0.05) # Volts/Ampere
+    #     QE ufloat(0.52,0.015) # Ampere/Watt
+    #     theta_omega = (np.pi * ((25.4E-3) ** 2))/(4*np.pi*((150E-3) ** 2))
+    #
+    #     return V_out / (QE * G * S * T * theta_omega * gamma_sc(delta) * E_nu)
+
+    return
+
+
 def main(argv: list) -> int:
     print(list(get_data(data_folder + "F0004CH1.CSV")))
 
@@ -47,26 +72,3 @@ def main(argv: list) -> int:
 
 if __name__ == "__main__":
     main(sys.argv)
-def conv_volts_to_atomnumber():
-
-    # test asdf
-
-    def intens_0(p_powermeter):
-        return (2 * p_powermeter) / (np.pi * ((2E-3) ** 2))
-
-    def gamma_sc(delta):
-        gamma = 2*np.pi*6.07E6
-        I_sat = 4.1 #milivolts per squarecentimetre
-        return (gamma/2) * ((intens_0(p_powermeter)/I_sat)/(1+(intens_0(p_powermeter)/I_sat) + 4 * ((delta ** 2)/gamma ** 2)))
-
-    def wavelength_to_energy(lambda):
-        return 6.62607015E-34 * 299792458 / lambda
-
-    def conversion_to_atoms(V_out):
-        S = 1E6 / (1E6 + 50)
-        T = 0.96
-        G = ufloat(4.75E6,4.75E6 * 0.05) # Volts/Ampere
-        QE ufloat(0.52,0.015) # Ampere/Watt
-        theta_omega = (np.pi * ((25.4E-3) ** 2))/(4*np.pi*((150E-3) ** 2))
-
-        return V_out / (QE * G * S * T * theta_omega * gamma_sc(delta) * E_nu)
