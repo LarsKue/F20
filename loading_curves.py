@@ -10,6 +10,7 @@ from scipy.optimize import curve_fit
 from scipy.stats import chi2
 
 data_folder = "data/loading_curves/"
+data_detuning = "data/detuning_coil_curves/"
 
 
 def get_data(filename, skip_rows=18, separator=","):
@@ -20,72 +21,56 @@ def get_data(filename, skip_rows=18, separator=","):
             yield tuple(float(x) for x in line.strip().split(separator) if x)
 
 
-def get_all_data():
-    for i in range(4, 42 + 1):
-        if i == 19:
+def get_all_data(directory_name, namerange, ignore=None):
+    for i in namerange:
+        if i in ignore:
             continue
-        filename = data_folder + "F{:04d}CH1.csv".format(i)
+        filename = directory_name + "F{:04d}CH1.csv".format(i)
         yield zip(*list(get_data(filename)))
-
-
-data_detuning = "data/detuning_coil_curves/"
-
-
-def get_detuning_data(filename_detuning, skip_rows=18, separator=","):
-    with open(filename_detuning, "r") as f:
-        for linenum, line in enumerate(f):
-            if linenum < skip_rows:
-                continue
-            yield tuple(float(x) for x in line.strip().split(separator) if x)
-
-
-def get_all_detuning_data():
-    i = 4
-    while True:
-        filename_detuning = data_detuning + "F{:04d}CH1.csv".format(i)
-        try:
-            yield zip(*list(get_detuning_data(filename_detuning)))
-        except FileNotFoundError:
-            break
-        i += 1
 
 
 def conv_volts_to_atomnumber():
     def intens_0(p_powermeter):
-        return (2 * p_powermeter) / (np.pi * ((2E-3) ** 2))
+        return (2 * p_powermeter) / (np.pi * (2e-3 ** 2))
 
     def gamma_sc(delta, p_powermeter):
-        gamma = 2 * np.pi * 6.07E6
-        I_sat = 4.1  # milivolts per squarecentimetre
+        gamma = 2 * np.pi * 6.07e6
+        I_sat = 4.1  # mV / cm^2
         return (gamma / 2) * ((intens_0(p_powermeter) / I_sat) / (
-                    1 + (intens_0(p_powermeter) / I_sat) + 4 * ((delta ** 2) / gamma ** 2)))
+                1 + (intens_0(p_powermeter) / I_sat) + 4 * ((delta ** 2) / gamma ** 2)))
 
     def wavelength_to_energy(l):
-        return 6.62607015E-34 * 299792458 / l
+        return 6.62607015e-34 * 299792458 / l
 
     def conversion_to_atoms(V_out, delta, E_nu):
         S = 1E6 / (1E6 + 50)
         T = 0.96
-        G = ufloat(4.75E6, 4.75E6 * 0.05)  # Volts/Ampere
-        QE = ufloat(0.52, 0.015)  # Ampere/Watt
-        theta_omega = (np.pi * (25.4E-3 ** 2)) / (4 * np.pi * (150E-3 ** 2))
+        G = ufloat(4.75e6, 4.75e6 * 0.05)  # V / A
+        QE = ufloat(0.52, 0.015)  # A / W
+        theta_omega = (np.pi * (25.4e-3 ** 2)) / (4 * np.pi * (150e-3 ** 2))
 
+        # FIXME: Missing Argument in gamma_sc
         return V_out / (QE * G * S * T * theta_omega * gamma_sc(delta) * E_nu)
 
     def detuning_calculator(x):
-        return  2*x -60 - 2*85
-
+        return 2 * x - 60 - 2 * 85
 
     detunings = detuning_calculator(np.array([109.75, 110.25, 110.75, 111.25, 111.75, 112.25]))
+
+    print("Die Werte sind nicht durch Punkte getrennt, das sind einfach floats und beim Datentyp np.float64 lässt "
+          "numpy scheinbar die Kommas weg in favor von den Punkten halt")
+
     print("hier", detuning_calculator(detunings))
 
     return
 
-conv_volts_to_atomnumber()
+
 def main(argv: list) -> int:
+    conv_volts_to_atomnumber()
+
     print(list(get_data(data_folder + "F0004CH1.CSV")))
 
-    # for xdata, ydata in get_all_data():
+    # for xdata, ydata in get_all_data(data_folder, range(4, 42 + 1), [18]):
     #     plt.plot(xdata, ydata)
     #     plt.show()
     #
@@ -93,9 +78,8 @@ def main(argv: list) -> int:
     #     print(ydata)
     #     print()
 
-    for xdata, ydata in get_all_detuning_data():
-        x, y = zip(*list(get_detuning_data("data/detuning_coil_curves/F0028CH1.CSV")))
-
+    x, y = zip(*list(get_data("data/detuning_coil_curves/F0028CH1.CSV")))
+    for xdata, ydata in get_all_data(data_detuning, range(4, 28 + 1)):
         y = np.array(y)
         y = np.where(y < 0.07, 0.0849, y)
 
