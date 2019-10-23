@@ -23,7 +23,7 @@ def get_data(filename, skip_rows=18, separator=","):
 
 def get_all_data(directory_name, namerange, ignore=None):
     for i in namerange:
-        if i in ignore:
+        if ignore and i in ignore:
             continue
         filename = directory_name + "F{:04d}CH1.csv".format(i)
         yield zip(*list(get_data(filename)))
