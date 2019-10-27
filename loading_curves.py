@@ -30,7 +30,6 @@ def get_all_data(directory_name, namerange, ignore=None):
 
 
 def conv_volts_to_atomnumber(V_out, entry_in_detunings):
-
     powermeter_y_beam = ufloat(7.5, 0.5)  # mW
     powermeter_x_beam = ufloat(4.8, 0.4)
     powermeter_z_beam = ufloat(8.3, 0.5)
@@ -38,16 +37,17 @@ def conv_volts_to_atomnumber(V_out, entry_in_detunings):
     p_powermeter = 2 * powermeter_y_beam + 2 * powermeter_x_beam + 2 * powermeter_z_beam
 
     def intens_0(x):  # We approximate the total power of all 6 laser beams to be:
-        return (2 * x) / (np.pi * (0.2 ** 2)) # mW / cm^2
+        return (2 * x) / (np.pi * (0.2 ** 2))  # mW / cm^2
 
-    #print("Intensity I0:", intens_0(p_powermeter))
+    # print("Intensity I0:", intens_0(p_powermeter))
 
     def detuning_calculator(x):
         return (2 * x) - 60 - (2 * 85)  # Mhz
 
-    detunings = np.tile(abs(detuning_calculator(unp.uarray([109.75, 110.25, 110.75, 111.25, 111.75, 112.25], [0.03]*6))), 2)
+    detunings = np.tile(
+        abs(detuning_calculator(unp.uarray([109.75, 110.25, 110.75, 111.25, 111.75, 112.25], [0.03] * 6))), 2)
 
-    #print(detunings)
+    # print(detunings)
 
     def gamma_sc(delta):
         gamma = 2 * np.pi * 6.07e6
@@ -65,17 +65,11 @@ def conv_volts_to_atomnumber(V_out, entry_in_detunings):
         QE = ufloat(0.52, 0.015)  # A / W
         theta_omega = (np.pi * (25.4E-3 ** 2)) / (4 * np.pi * (150E-3 ** 2))
 
-
-        return V_out / (QE * G * S * T * theta_omega * gamma_sc(detunings[entry_in_detunings]) * wavelength_to_energy(780E-9))
-
+        return V_out / (QE * G * S * T * theta_omega * gamma_sc(detunings[entry_in_detunings]) * wavelength_to_energy(
+            780E-9))
 
     return conversion_to_atoms(V_out, entry_in_detunings)
     # print(conversion_to_atoms(0.5, 0))
-
-
-
-
-
 
     # print("hier", detunings)
     #
@@ -83,8 +77,6 @@ def conv_volts_to_atomnumber(V_out, entry_in_detunings):
 
 
 def main(argv: list) -> int:
-
-
     # print(list(get_data(data_folder + "F0004CH1.CSV")))
 
     # for xdata, ydata in get_all_data(data_folder, range(4, 42 + 1), [18]):
@@ -95,8 +87,10 @@ def main(argv: list) -> int:
     #     print(ydata)
     #     print()
     def loading_dgl(t, loading_rate, alpha, x0, y0):
-        return ((loading_rate * (t - x0))/(2 + (alpha * (t - x0)))) + y0
+        return ((loading_rate * (t - x0)) / (2 + (alpha * (t - x0)))) + y0
 
+    def magnetic_field_gradient(i):
+        return 1.1E-6 * (90 * i / (8.5 ** 2))  # i: current in Ampere, units: T/cm
 
     for xdata, ydata in get_all_data(data_detuning, range(4, 28 + 1)):
         x, y = zip(*list(get_data("data/detuning_coil_curves/F0028CH1.CSV")))
@@ -108,18 +102,17 @@ def main(argv: list) -> int:
         # plt.plot(x, unp.nominal_values(y))
         xdata = np.array(xdata)
 
-
         ydata = np.array(ydata)
         ydata = conv_volts_to_atomnumber(ydata, 0)
         ydata = ydata - y
         # print(ydata)
-        popt, pcov = curve_fit(loading_dgl,xdata, unp.nominal_values(ydata), p0 = [100,0.005,6.39,-460000], maxfev = 10000)
+        popt, pcov = curve_fit(loading_dgl, xdata, unp.nominal_values(ydata), p0=[100, 0.005, 6.39, -460000],
+                               maxfev=10000)
         plt.plot(xdata, loading_dgl(xdata, *popt))
-        plt.plot(xdata, unp.nominal_values(ydata), marker = '.', linewidth = 0)
+        plt.plot(xdata, unp.nominal_values(ydata), marker='.', linewidth=0)
         plt.xlabel("Time [s]")
         plt.ylabel("Number of Atoms")
         plt.show()
-
 
     return 0
 
