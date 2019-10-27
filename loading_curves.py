@@ -40,7 +40,7 @@ def conv_volts_to_atomnumber(V_out, entry_in_detunings):
     def intens_0(x):  # We approximate the total power of all 6 laser beams to be:
         return (2 * x) / (np.pi * (0.2 ** 2)) # mW / cm^2
 
-    print("Intensity I0:", intens_0(p_powermeter))
+    #print("Intensity I0:", intens_0(p_powermeter))
 
     def detuning_calculator(x):
         return (2 * x) - 60 - (2 * 85)  # Mhz
@@ -67,23 +67,25 @@ def conv_volts_to_atomnumber(V_out, entry_in_detunings):
 
 
         return V_out / (QE * G * S * T * theta_omega * gamma_sc(detunings[entry_in_detunings]) * wavelength_to_energy(780E-9))
+
+
     return conversion_to_atoms(V_out, entry_in_detunings)
-    #print(conversion_to_atoms(0.5, 0))
+    # print(conversion_to_atoms(0.5, 0))
 
 
 
 
 
 
-    print("hier", detunings)
-
-    return
+    # print("hier", detunings)
+    #
+    # return
 
 
 def main(argv: list) -> int:
 
 
-    print(list(get_data(data_folder + "F0004CH1.CSV")))
+    # print(list(get_data(data_folder + "F0004CH1.CSV")))
 
     # for xdata, ydata in get_all_data(data_folder, range(4, 42 + 1), [18]):
     #     plt.plot(xdata, ydata)
@@ -92,19 +94,32 @@ def main(argv: list) -> int:
     #     print(xdata)
     #     print(ydata)
     #     print()
+    def loading_dgl(t, loading_rate, alpha, x0, y0):
+        return ((loading_rate * (t - x0))/(2 + (alpha * (t - x0)))) + y0
 
-    x, y = zip(*list(get_data("data/detuning_coil_curves/F0028CH1.CSV")))
+
     for xdata, ydata in get_all_data(data_detuning, range(4, 28 + 1)):
+        x, y = zip(*list(get_data("data/detuning_coil_curves/F0028CH1.CSV")))
         y = np.array(y)
-        y = np.where(y < 0.07, 0.0849, y)
+        y = np.where(y < 0.07993, 0.08505, y)
+        # y = np.where(y > 0.0542, 0.05055, y)
         y = conv_volts_to_atomnumber(y, 0)
-
+        # print([conv_volts_to_atomnumber(0.5,0),conv_volts_to_atomnumber(0.5,4)])
+        # plt.plot(x, unp.nominal_values(y))
         xdata = np.array(xdata)
+
+
         ydata = np.array(ydata)
         ydata = conv_volts_to_atomnumber(ydata, 0)
         ydata = ydata - y
-        plt.plot(xdata, unp.nominal_values(ydata))
+        # print(ydata)
+        popt, pcov = curve_fit(loading_dgl,xdata, unp.nominal_values(ydata), p0 = [100,0.005,6.39,-460000], maxfev = 10000)
+        plt.plot(xdata, loading_dgl(xdata, *popt))
+        plt.plot(xdata, unp.nominal_values(ydata), marker = '.', linewidth = 0)
+        plt.xlabel("Time [s]")
+        plt.ylabel("Number of Atoms")
         plt.show()
+
 
     return 0
 
