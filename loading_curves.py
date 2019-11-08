@@ -69,11 +69,6 @@ def conv_volts_to_atomnumber(V_out, entry_in_detunings):
             780E-9))
 
     return conversion_to_atoms(V_out, entry_in_detunings)
-    # print(conversion_to_atoms(0.5, 0))
-
-    # print("hier", detunings)
-    #
-    # return
 
 
 def main(argv: list) -> int:
