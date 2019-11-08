@@ -10,6 +10,8 @@ from scipy.stats import chi2
 
 from typing import Callable, List
 
+from utils import *
+
 
 data_folder = "data/spectroscopy/"
 
@@ -24,14 +26,14 @@ def lorentzian(x, x0, gamma, amp, y0, a):
     return a * x + y0 + amp * gamma ** 2 / (((x - x0) ** 2 + gamma ** 2) * np.pi * gamma)
 
 
-def modify_data(modifier, *data):
-    for d in data:
-        yield type(d)(modifier(x) for x in d)
-
-
 # virgin function from script
 # def lorentzian(x, x0, gamma, amp, y0):
 #     return y0 + (amp / (1 + (4 * (x - x0) ** 2 / gamma ** 2)))
+
+
+def rolling_mean(data, N: int):
+    cumsum = np.cumsum(np.insert(data, 0, 0))
+    return (cumsum[N:] - cumsum[:-N]) / float(N)
 
 
 def voltage_to_freq(v):
@@ -69,7 +71,7 @@ def get_data(filename: str):
             yield tuple(float(x) for x in line.split("\t"))
 
 
-def calibration(plot=True):
+def calibration(plot=True, log=True):
     """ Frequency Calibration """
     calib_lims = [(-0.8, -0.41), (-0.41, -0.11), (0.13, 0.49), (0.63, 0.95)]
     inner_lims = [(-0.57, -0.505), (-0.31, -0.265), (0.30, 0.33), (0.77, 0.83)]
@@ -105,7 +107,8 @@ def calibration(plot=True):
         P0 = [ufloat(popt[j], np.sqrt(pcov[j][j])) for j in range(len(popt))]
         voltages.append(P0[1])
 
-        print("P0 {}: {}".format(i, P0))
+        if log:
+            print("P0 {}: {}".format(i, P0))
 
     Rb87F1F2 = 6.834682610904290e9  # Hz
     Rb85F2F3 = 3.0357324390e9  # Hz
@@ -116,14 +119,16 @@ def calibration(plot=True):
 
     delta_V = abs(voltages[2] - voltages[1])
 
-    print("Test with literature value for Lorenz:", voltage_to_freq(delta_V) * 1e-9, "GHz")
-    print("Deviation:", 100 * (voltage_to_freq(delta_V) - Rb85F2F3) / Rb85F2F3, "%")
+    if log:
+        print("Test with literature value for Lorenz:", voltage_to_freq(delta_V) * 1e-9, "GHz")
+        print("Deviation:", 100 * (voltage_to_freq(delta_V) - Rb85F2F3) / Rb85F2F3, "%")
 
     dVdf2 = delta_V / Rb85F2F3
 
-    print("dVdf =", dVdf1)
-    # checking result
-    print("dVdf2 =", dVdf2)
+    if log:
+        print("dVdf =", dVdf1)
+        # checking result
+        print("dVdf2 =", dVdf2)
 
     if plot:
         plt.xlabel("Aux Out [V]")
@@ -132,7 +137,7 @@ def calibration(plot=True):
         plt.show()
 
 
-def get_lorentz_data(plot=True, return_temperatures=False):
+def get_lorentz_data(plot=True, return_temperatures=False, log=True):
     filenames = ["85F2", "85F3", "87F1", "87F2"]
 
     xlims = [(0.25, 0.28), (-0.29, -0.245), (0.65, 0.71), (0.15, 0.22)]
@@ -165,7 +170,8 @@ def get_lorentz_data(plot=True, return_temperatures=False):
 
         T = sigma ** 2 * m * consts.c ** 2 / (nu_0 ** 2 * consts.k)
 
-        print("T =", T, "K")
+        if log:
+            print("T =", T, "K")
         temperatures.append(T)
 
         lorentzdata = np.array(list(data_in)) - gaussian(np.array(list(data_out)), *popt)
@@ -205,7 +211,7 @@ def get_hyperfine_data(plot=True):
             ax2 = ax1.twinx()
 
             color = "tab:green"
-            ax2.set_ylabel("PDH [V]", color=color)
+            ax2.set_ylabel("PDH [a.u.]", color=color)
             ax2.plot(data_out, pdh, color=color)
             ax2.tick_params(axis="y", labelcolor=color)
 
@@ -256,7 +262,6 @@ def lorentzfit(lorentz_data, plot=True, return_gammas=False):
 
             gamma = ufloat(popt[1], np.sqrt(pcov[1][1]))
 
-            print(voltage_to_freq(gamma) * 1e-6)
             gammas.append(voltage_to_freq(gamma) * 1e-6)
 
             if plot:
@@ -273,7 +278,31 @@ def lorentzfit(lorentz_data, plot=True, return_gammas=False):
 
 
 def hyperfine(plot=True):
-    data = list(get_hyperfine_data(plot=True))
+    # data = list(get_hyperfine_data(plot=False))
+
+    for data_out, data_in, pdh in get_hyperfine_data(plot=False):
+        mean_N = 30
+        smooth_pdh = rolling_mean(pdh, mean_N)
+
+        fig, ax1 = plt.subplots(figsize=(10, 8))
+        color = "tab:blue"
+        ax1.set_xlabel("Aux Out [V]")
+        ax1.set_ylabel("Aux In [V]", color=color)
+        ax1.plot(data_out, data_in, color=color)
+        ax1.tick_params(axis="y", labelcolor=color)
+
+        ax2 = ax1.twinx()
+        ax2.axhline(color="red")
+
+        color = "tab:green"
+        ax2.set_ylabel("PDH [a.u.]", color=color)
+        ax2.plot(data_out[mean_N // 2:-mean_N // 2 + 1], smooth_pdh, color=color)
+        ax2.tick_params(axis="y", labelcolor=color)
+
+        plt.show()
+
+    # smooth_data = pd.rolling_mean(data, 5).plot(style="k")
+    # plt.show()
 
     # for i in range(len(data)):
     #     data[i] = tuple(np.array(x) for x in data[i])
@@ -287,8 +316,8 @@ def hyperfine(plot=True):
 
 
 def main(argv: list) -> int:
-    # calibration()
-    lorentz_data = list(get_lorentz_data(plot=False))
+    # calibration(log=False)
+    lorentz_data = list(get_lorentz_data(plot=False, log=False))
     lorentzfit(lorentz_data, plot=False)
     hyperfine()
     return 0

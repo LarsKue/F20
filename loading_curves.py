@@ -9,6 +9,8 @@ from scipy import constants as consts
 from scipy.optimize import curve_fit
 from scipy.stats import chi2
 
+from utils import *
+
 data_folder = "data/loading_curves/"
 data_detuning = "data/detuning_coil_curves/"
 
@@ -91,6 +93,7 @@ def main(argv: list) -> int:
         x, y = zip(*list(get_data("data/detuning_coil_curves/F0028CH1.CSV")))
         y = np.array(y)
         y = np.where(y < 0.07993, 0.08505, y)
+
         # y = np.where(y > 0.0542, 0.05055, y)
         y = conv_volts_to_atomnumber(y, 0)
         # print([conv_volts_to_atomnumber(0.5,0),conv_volts_to_atomnumber(0.5,4)])
@@ -101,6 +104,10 @@ def main(argv: list) -> int:
         ydata = conv_volts_to_atomnumber(ydata, 0)
         ydata = ydata - y
         # print(ydata)
+
+        """ HERE """
+        ydata = np.where(ydata > 0, ydata, 0)
+
         popt, pcov = curve_fit(loading_dgl, xdata, unp.nominal_values(ydata), p0=[100, 0.005, 6.39, -460000],
                                maxfev=10000)
         plt.plot(xdata, loading_dgl(xdata, *popt))
