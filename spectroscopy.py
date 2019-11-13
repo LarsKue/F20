@@ -284,6 +284,16 @@ def hyperfine(plot=True):
         mean_N = 30
         smooth_pdh = rolling_mean(pdh, mean_N)
 
+
+        # find solutions for phd
+        print(list(closest_indices(data_out[mean_N // 2:-mean_N // 2 + 1], *np.linspace(-0.2, 0.2, 11))))
+        print("-----")
+        peaks = dsolve(data_out[mean_N // 2:-mean_N // 2 + 1], smooth_pdh, x0=np.linspace(-0.2, 0.2, 11))
+
+        print(peaks)
+
+
+
         fig, ax1 = plt.subplots(figsize=(10, 8))
         color = "tab:blue"
         ax1.set_xlabel("Aux Out [V]")
