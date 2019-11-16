@@ -46,23 +46,6 @@ def u_to_kg(m):
     return 1.66053904e-27 * m
 
 
-def mask_data(mask: Callable[[List], List], keyarr: List, *data: List[List], modify_keyarr: bool = True,
-              output_type_modifier=None):
-    m: List = mask(keyarr)
-    if modify_keyarr:
-        result = (x for i, x in enumerate(keyarr) if m[i])
-        if output_type_modifier is None:
-            yield type(keyarr)(result)
-        else:
-            yield output_type_modifier(result)
-    for arr in data:
-        result = (x for i, x in enumerate(arr) if m[i])
-        if output_type_modifier is None:
-            yield type(arr)(result)
-        else:
-            yield output_type_modifier(result)
-
-
 def get_data(filename: str):
     with open(filename, "r") as f:
         for i, line in enumerate(f):
@@ -278,21 +261,15 @@ def lorentzfit(lorentz_data, plot=True, return_gammas=False):
 
 
 def hyperfine(plot=True):
-    # data = list(get_hyperfine_data(plot=False))
 
     for data_out, data_in, pdh in get_hyperfine_data(plot=False):
-        mean_N = 30
-        smooth_pdh = rolling_mean(pdh, mean_N)
-
+        mean_N = 20
+        smooth_pdh = np.array(rolling_mean(pdh, mean_N))
 
         # find solutions for phd
-        print(list(closest_indices(data_out[mean_N // 2:-mean_N // 2 + 1], *np.linspace(-0.2, 0.2, 11))))
-        print("-----")
-        peaks = dsolve(data_out[mean_N // 2:-mean_N // 2 + 1], smooth_pdh, x0=np.linspace(-0.2, 0.2, 11))
+        peaks = dsolve(np.array(data_out[mean_N // 2:-mean_N // 2 + 1]), smooth_pdh, x0=np.linspace(min(data_out) + 0.1 * abs(min(data_out)), max(data_out) - 0.1 * abs(max(data_out)), 11))
 
-        print(peaks)
-
-
+        print("peaks:", sorted(peaks))
 
         fig, ax1 = plt.subplots(figsize=(10, 8))
         color = "tab:blue"
@@ -303,6 +280,9 @@ def hyperfine(plot=True):
 
         ax2 = ax1.twinx()
         ax2.axhline(color="red")
+
+        for x0 in peaks:
+            plt.axvline(x=x0)
 
         color = "tab:green"
         ax2.set_ylabel("PDH [a.u.]", color=color)
