@@ -262,7 +262,7 @@ def hyperfine(plot=True):
         smooth_pdh = np.array(rolling_mean(pdh, mean_N))
 
         # find solutions for phd
-        peaks = dsolve(np.array(data_out[mean_N // 2:-mean_N // 2 + 1]), smooth_pdh, x0=np.linspace(min(data_out) + 0.1 * abs(min(data_out)), max(data_out) - 0.1 * abs(max(data_out)), 11))
+        peaks = dsolve(np.array(mask_rolling_mean(data_out, mean_N)), smooth_pdh, x0=np.linspace(min(data_out) + 0.1 * abs(min(data_out)), max(data_out) - 0.1 * abs(max(data_out)), 11))
 
         print("peaks:", sorted(peaks))
 
@@ -281,7 +281,7 @@ def hyperfine(plot=True):
 
         color = "tab:green"
         ax2.set_ylabel("PDH [a.u.]", color=color)
-        ax2.plot(data_out[mean_N // 2:-mean_N // 2 + 1], smooth_pdh, color=color)
+        ax2.plot(mask_rolling_mean(data_out, mean_N), smooth_pdh, color=color)
         ax2.tick_params(axis="y", labelcolor=color)
 
         plt.show()

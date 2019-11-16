@@ -16,6 +16,10 @@ def rolling_mean(data, N: int):
     return (cumsum[N:] - cumsum[:-N]) / float(N)
 
 
+def mask_rolling_mean(data, N: int):
+    return data[N // 2: -N // 2 + 1]
+
+
 def mask_data(mask: Callable[[Iterable], List], keyarr: Iterable, *data: List[Iterable], modify_keyarr: bool = True,
               output_type_modifier: Callable = None):
     m: List = mask(keyarr)
