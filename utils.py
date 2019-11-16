@@ -11,6 +11,11 @@ def modify_data(modifier, *data):
         yield type(d)(modifier(x) for x in d)
 
 
+def rolling_mean(data, N: int):
+    cumsum = np.cumsum(np.insert(data, 0, 0))
+    return (cumsum[N:] - cumsum[:-N]) / float(N)
+
+
 def mask_data(mask: Callable[[Iterable], List], keyarr: Iterable, *data: List[Iterable], modify_keyarr: bool = True,
               output_type_modifier: Callable = None):
     m: List = mask(keyarr)

@@ -31,11 +31,6 @@ def lorentzian(x, x0, gamma, amp, y0, a):
 #     return y0 + (amp / (1 + (4 * (x - x0) ** 2 / gamma ** 2)))
 
 
-def rolling_mean(data, N: int):
-    cumsum = np.cumsum(np.insert(data, 0, 0))
-    return (cumsum[N:] - cumsum[:-N]) / float(N)
-
-
 def voltage_to_freq(v):
     dVdf = ufloat(1.9366, 0.0008) * 1e-10  # Rb87
     # dVdf = ufloat(1.9504, 0.0008) * 1e-10  # Rb85
