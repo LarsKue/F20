@@ -12,20 +12,36 @@ def modify_data(modifier: Callable, *data):
         yield type(d)(modifier(x) for x in d)
 
 
-def rolling_mean(data: np.ndarray, N: int):
+def rolling_mean(data: Sequence, n: int):
     """ Computes the rolling mean of a data set over N data points """
     cumsum = np.cumsum(np.insert(data, 0, 0))
-    return (cumsum[N:] - cumsum[:-N]) / float(N)
+    return (cumsum[n:] - cumsum[:-n]) / float(n)
 
 
-def mask_rolling_mean(data: Sequence, N: int):
+def mask_rolling_mean(data: Sequence, n: int):
     """ Mask xdata for plotting with rolling mean ydata """
-    return data[N // 2: -N // 2 + 1]
+    return data[n // 2: -n // 2 + 1]
 
 
-def mask_data(mask: Callable[[Iterable], List], keyarr: Iterable, *data: List[Iterable], modify_keyarr: bool = True,
+def mask_data(mask: Callable[[Iterable], Sequence], keyarr: Iterable, *data: List[Iterable], modify_keyarr: bool = True,
               output_type_modifier: Callable = None):
-    """ Masks a dataset given a function that decides whether a value should be kept (based on that value) """
+    """ Masks a dataset given a function that decides whether a value should be kept (based on that value)
+
+    :param mask:    Function that takes an iterable data set and returns a sequence of the size of the data set,
+                    with True or False values according to whether that data point should be kept
+
+    :param keyarr:  The array which decides what datapoints should be kept
+
+    :param data:    Other arrays that shall be masked in the same way
+
+    :param modify_keyarr:   If False, the keyarray will be left as is (but still returned)
+
+    :param output_type_modifier:    For data set conversion between types, e.g. if you give this function a tuple but
+                                    want a list, set output_type_modifier=list
+                                    If set to None, data sets will be returned as their previous individual types
+
+    :return:    The masked data sets
+    """
     m: List = mask(keyarr)
     if modify_keyarr:
         result = (x for i, x in enumerate(keyarr) if m[i])
@@ -43,7 +59,9 @@ def mask_data(mask: Callable[[Iterable], List], keyarr: Iterable, *data: List[It
 
 def index_mask_data(mask: Sequence, keyarr: Sequence, *data: List[Sequence], modify_keyarr: bool = True,
                     output_type_modifier: Callable = None):
-    """ Masks a dataset given a sequence of indices, keeping only data points at those indices """
+    """ Masks a dataset given a sequence of indices, keeping only data points at those indices
+        For additional info, see mask_data
+    """
     if modify_keyarr:
         result = (keyarr[i] for i in mask)
         if output_type_modifier is None:
@@ -72,7 +90,7 @@ def sort_together(keyarr: [Iterable, Sized], *arrs) -> List:
         yield list(map(arr.__getitem__, idx))
 
 
-def dsolve(xdata, ydata, *args, **kwargs):
+def dsolve(xdata: Sequence, ydata: Sequence, *args, **kwargs):
     """ Solve a given dataset for 0 by interleaving the data points with linear functions"""
     # need x to be sorted (monotonically increasing) for interleaving
     xdata, ydata = sort_together(xdata, ydata)
