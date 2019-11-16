@@ -91,50 +91,71 @@ def main(argv: list) -> int:
     #     print(ydata)
     #     print()
 
-
     def loading_dgl(t, loading_rate, alpha, t0):
-        return (loading_rate/alpha) * (1 - np.exp(-alpha*(t-t0)))
+        return (loading_rate / alpha) * (1 - np.exp(-alpha * (t - t0)))
 
     def magnetic_field_gradient(i):
         return 1.1E-6 * (90 * i / (8.5 ** 2))  # i: current in Ampere, units: T/cm
 
-    for xdata, ydata in get_all_data(data_detuning, range(4, 28 + 1)):
+    mask_array = [(6.3, 10), (3.9, 9.9), (0.39, 9.8), (0.29, 10.8), (0.244, 10.67), (3.634, 13.5), (0.2705, 10.4),
+                  (-0.195, 10.16), (-0.0872, 10.16), (0.56, 10.7), (0.506, 10.86), (0.2903, 10.48), (0.2384, 10.83),
+                  (0.29, 10.0684), (0.304, 10.5282), (0.452, 10.59), (0.344, 10.5), (0.3077, 9.67), (0.332, 10.31),
+                  (0.332, 10.5), (0.2856, 10.79), (0.265, 10.369), (0.344, 10.32), (0.288, 10.34)]
+    L = []
+    delta_L = []
+    A = []
+    delta_A = []
+
+    for i, (xdata, ydata) in enumerate(get_all_data(data_detuning, range(4, 28))):   # oder 28 + 1
+        a, b = mask_array[i]
         x, y = zip(*list(get_data("data/detuning_coil_curves/F0028CH1.CSV")))
         y = np.array(y)
-        y = np.where(y < 0.07993, 0.08505, y)
 
+        # y = np.where(y < 0.07993, 0.08505, y)
+        y = np.mean(y[320:750]) # nominal Background value in volts
+        # print(y)
         # y = np.where(y > 0.0542, 0.05055, y)
         y = conv_volts_to_atomnumber(y, 0)
         # print([conv_volts_to_atomnumber(0.5,0),conv_volts_to_atomnumber(0.5,4)])
-        # plt.plot(x, unp.nominal_values(y))
+        # plt.plot(x[320:750], [y]*len(x[320:750]), marker = ".", linewidth=0)
         xdata = np.array(xdata)
 
         ydata = np.array(ydata)
         ydata = conv_volts_to_atomnumber(ydata, 0)
         ydata = ydata - y
         # print(ydata)
-        ydata = np.where(ydata < 0 , 0, ydata)
+        ydata = np.where(ydata < 0, 0, ydata)
 
-
-
-        mxdata, mydata = deepcopy(xdata), deepcopy(ydata)
-        n = 50
-        mydata = rolling_mean(mydata, n)
+        omxdata, omydata = deepcopy(xdata), deepcopy(ydata)
+        n = 5
+        omydata = rolling_mean(omydata, n)
 
         @np.vectorize
         def mask(x):
-            return 6.3 <= x <= 10
+            nonlocal a, b
+            return a <= x <= b
 
-        mxdata, mydata = list(mxdata), list(mydata)
-
+        # print(a, b)
+        mxdata, mydata = list(omxdata), list(omydata)
+        # print(len(mxdata), len(mydata))
         mxdata, mydata = tuple(mask_data(mask, mask_rolling_mean(mxdata, n), mydata))
-        popt, pcov = curve_fit(loading_dgl, mxdata, unp.nominal_values(mydata))
-        plt.plot(mxdata, loading_dgl(mxdata, *popt))
-        plt.plot(mxdata, unp.nominal_values(mydata), marker='.', linewidth=0)
-        # plt.plot(xdata, unp.nominal_values(ydata), marker=".", linewidth=0)
-        plt.xlabel("Time [s]")
-        plt.ylabel("Number of Atoms")
-        plt.show()
+        popt, pcov = curve_fit(loading_dgl, mxdata, unp.nominal_values(mydata), maxfev=10000)
+        # # plt.plot(mxdata, loading_dgl(mxdata, *popt))
+        # # plt.plot(mxdata, unp.nominal_values(mydata), marker='.', linewidth=0)
+        # # #plt.plot(xdata, unp.nominal_values(ydata), marker=".", linewidth=0)
+        # # plt.xlabel("Time [s]")
+        # # plt.ylabel("Number of Atoms")
+        # # plt.show()
+        #
+        L.append(popt[0])
+        delta_L.append(np.sqrt(pcov[0][0]))
+        A.append(popt[1])
+        delta_A.append(np.sqrt(pcov[1][1]))
+
+    print(A)
+    print(delta_A)
+    print(L)
+    print(delta_L)
 
     return 0
 
