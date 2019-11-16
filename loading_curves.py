@@ -9,6 +9,8 @@ from scipy import constants as consts
 from scipy.optimize import curve_fit
 from scipy.stats import chi2
 
+from copy import deepcopy
+
 from utils import *
 
 data_folder = "data/loading_curves/"
@@ -71,6 +73,11 @@ def conv_volts_to_atomnumber(V_out, entry_in_detunings):
             780E-9))
 
     return conversion_to_atoms(V_out, entry_in_detunings)
+    # print(conversion_to_atoms(0.5, 0))
+
+    # print("hier", detunings)
+    #
+    # return
 
 
 def main(argv: list) -> int:
@@ -83,8 +90,10 @@ def main(argv: list) -> int:
     #     print(xdata)
     #     print(ydata)
     #     print()
-    def loading_dgl(t, loading_rate, alpha, x0, y0):
-        return ((loading_rate * (t - x0)) / (2 + (alpha * (t - x0)))) + y0
+
+
+    def loading_dgl(t, loading_rate, alpha, t0):
+        return (loading_rate/alpha) * (1 - np.exp(-alpha*(t-t0)))
 
     def magnetic_field_gradient(i):
         return 1.1E-6 * (90 * i / (8.5 ** 2))  # i: current in Ampere, units: T/cm
@@ -104,14 +113,25 @@ def main(argv: list) -> int:
         ydata = conv_volts_to_atomnumber(ydata, 0)
         ydata = ydata - y
         # print(ydata)
+        ydata = np.where(ydata < 0 , 0, ydata)
 
-        """ HERE """
-        ydata = np.where(ydata > 0, ydata, 0)
 
-        popt, pcov = curve_fit(loading_dgl, xdata, unp.nominal_values(ydata), p0=[100, 0.005, 6.39, -460000],
-                               maxfev=10000)
-        plt.plot(xdata, loading_dgl(xdata, *popt))
-        plt.plot(xdata, unp.nominal_values(ydata), marker='.', linewidth=0)
+
+        mxdata, mydata = deepcopy(xdata), deepcopy(ydata)
+        n = 50
+        mydata = rolling_mean(mydata, n)
+
+        @np.vectorize
+        def mask(x):
+            return 6.3 <= x <= 10
+
+        mxdata, mydata = list(mxdata), list(mydata)
+
+        mxdata, mydata = tuple(mask_data(mask, mask_rolling_mean(mxdata, n), mydata))
+        popt, pcov = curve_fit(loading_dgl, mxdata, unp.nominal_values(mydata))
+        plt.plot(mxdata, loading_dgl(mxdata, *popt))
+        plt.plot(mxdata, unp.nominal_values(mydata), marker='.', linewidth=0)
+        # plt.plot(xdata, unp.nominal_values(ydata), marker=".", linewidth=0)
         plt.xlabel("Time [s]")
         plt.ylabel("Number of Atoms")
         plt.show()
