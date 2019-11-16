@@ -6,22 +6,26 @@ from math import isclose
 import numpy as np
 
 
-def modify_data(modifier, *data):
+def modify_data(modifier: Callable, *data):
+    """ Apply a modifier function to every item in a dataset """
     for d in data:
         yield type(d)(modifier(x) for x in d)
 
 
-def rolling_mean(data, N: int):
+def rolling_mean(data: np.ndarray, N: int):
+    """ Computes the rolling mean of a data set over N data points """
     cumsum = np.cumsum(np.insert(data, 0, 0))
     return (cumsum[N:] - cumsum[:-N]) / float(N)
 
 
-def mask_rolling_mean(data, N: int):
+def mask_rolling_mean(data: Sequence, N: int):
+    """ Mask xdata for plotting with rolling mean ydata """
     return data[N // 2: -N // 2 + 1]
 
 
 def mask_data(mask: Callable[[Iterable], List], keyarr: Iterable, *data: List[Iterable], modify_keyarr: bool = True,
               output_type_modifier: Callable = None):
+    """ Masks a dataset given a function that decides whether a value should be kept (based on that value) """
     m: List = mask(keyarr)
     if modify_keyarr:
         result = (x for i, x in enumerate(keyarr) if m[i])
@@ -39,6 +43,7 @@ def mask_data(mask: Callable[[Iterable], List], keyarr: Iterable, *data: List[It
 
 def index_mask_data(mask: Sequence, keyarr: Sequence, *data: List[Sequence], modify_keyarr: bool = True,
                     output_type_modifier: Callable = None):
+    """ Masks a dataset given a sequence of indices, keeping only data points at those indices """
     if modify_keyarr:
         result = (keyarr[i] for i in mask)
         if output_type_modifier is None:
