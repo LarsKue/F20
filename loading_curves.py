@@ -165,60 +165,60 @@ def main(argv: list) -> int:
     # print(delta_L)
     # print(N_max)
 
-            ydata = np.array(ydata)
-            ydata = conv_volts_to_atomnumber(ydata, 0)
-            ydata = ydata - y
-            # print(ydata)
-            # ydata = np.where(ydata < 0, 0, ydata)
-            # n = 5
-            # omydata = rolling_mean(omydata, n)
+        # ydata = np.array(ydata)
+        # ydata = conv_volts_to_atomnumber(ydata, 0)
+        # ydata = ydata - y
+        # # print(ydata)
+        # # ydata = np.where(ydata < 0, 0, ydata)
+        # # n = 5
+        # # omydata = rolling_mean(omydata, n)
+        #
+        # @np.vectorize
+        # def mask(x):
+        #     nonlocal a, b
+        #     return a <= x <= b
+        #
+        # # print(a, b)
+        # mxdata, mydata = list(xdata), list(ydata)
+        # # print(len(mxdata), len(mydata))
+        # mxdata, mydata = tuple(mask_data(mask, mxdata, mydata))
+        # popt, pcov = curve_fit(loading_dgl, mxdata, unp.nominal_values(mydata), maxfev=5000)
+        # # plt.plot(mxdata, loading_dgl(mxdata, *popt))
+        # # plt.plot(mxdata, unp.nominal_values(mydata), marker='.', linewidth=0)
+        # # # plt.plot(xdata, unp.nominal_values(ydata), marker=".", linewidth=0)
+        # # plt.xlabel("Time [s]")
+        # # plt.ylabel("Number of Atoms")
+        # # print("L=", popt[0]," alpha=", popt[1], "N_max=", popt[0]/popt[1])
+        # # plt.show()
+        # # print(popt[2])
+        # L.append(popt[0])
+        # delta_L.append(np.sqrt(pcov[0][0]))
+        # A.append(popt[1])
+        # delta_A.append(np.sqrt(pcov[1][1]))
+        # N_max.append(popt[0] / popt[1])
+        # delta_N_max.append(
+        #     unp.std_devs(ufloat(popt[0], np.sqrt(pcov[0][0])) / ufloat(popt[1], np.sqrt(pcov[1][1]))))
+        #
+        # return L, delta_L, A, delta_A, N_max, delta_N_max
 
-            @np.vectorize
-            def mask(x):
-                nonlocal a, b
-                return a <= x <= b
+    # L, delta_L, A, delta_A, N_max, delta_N_max = fitparameter_getter()
+    # print(A)
+    # print(delta_A)
+    # print(L)
+    # print(delta_L)
+    # print(N_max)
 
-            # print(a, b)
-            mxdata, mydata = list(xdata), list(ydata)
-            # print(len(mxdata), len(mydata))
-            mxdata, mydata = tuple(mask_data(mask, mxdata, mydata))
-            popt, pcov = curve_fit(loading_dgl, mxdata, unp.nominal_values(mydata), maxfev=5000)
-            # plt.plot(mxdata, loading_dgl(mxdata, *popt))
-            # plt.plot(mxdata, unp.nominal_values(mydata), marker='.', linewidth=0)
-            # # plt.plot(xdata, unp.nominal_values(ydata), marker=".", linewidth=0)
-            # plt.xlabel("Time [s]")
-            # plt.ylabel("Number of Atoms")
-            # print("L=", popt[0]," alpha=", popt[1], "N_max=", popt[0]/popt[1])
-            # plt.show()
-            # print(popt[2])
-            L.append(popt[0])
-            delta_L.append(np.sqrt(pcov[0][0]))
-            A.append(popt[1])
-            delta_A.append(np.sqrt(pcov[1][1]))
-            N_max.append(popt[0] / popt[1])
-            delta_N_max.append(
-                unp.std_devs(ufloat(popt[0], np.sqrt(pcov[0][0])) / ufloat(popt[1], np.sqrt(pcov[1][1]))))
-
-        return L, delta_L, A, delta_A, N_max, delta_N_max
-
-    L, delta_L, A, delta_A, N_max, delta_N_max = fitparameter_getter()
-    print(A)
-    print(delta_A)
-    print(L)
-    print(delta_L)
-    print(N_max)
-
-    all_fit_params = []
-    all_fit_params.append(A)
-    all_fit_params.append(L)
-    all_fit_params.append(N_max)
-    all_fit_params = np.array(all_fit_params)
-
-    delta_all_fit_params = []
-    delta_all_fit_params.append(delta_A)
-    delta_all_fit_params.append(delta_L)
-    delta_all_fit_params.append(delta_N_max)
-    delta_all_fit_params = np.array(delta_all_fit_params)
+    # all_fit_params = []
+    # all_fit_params.append(A)
+    # all_fit_params.append(L)
+    # all_fit_params.append(N_max)
+    # all_fit_params = np.array(all_fit_params)
+    #
+    # delta_all_fit_params = []
+    # delta_all_fit_params.append(delta_A)
+    # delta_all_fit_params.append(delta_L)
+    # delta_all_fit_params.append(delta_N_max)
+    # delta_all_fit_params = np.array(delta_all_fit_params)
 
 
     def detuning_calculator(x):
