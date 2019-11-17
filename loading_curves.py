@@ -8,7 +8,7 @@ from uncertainties import unumpy as unp
 from scipy import constants as consts
 from scipy.optimize import curve_fit
 from scipy.stats import chi2
-
+from mpl_toolkits.mplot3d import Axes3D
 from copy import deepcopy
 
 from utils import *
@@ -93,9 +93,6 @@ def main(argv: list) -> int:
 
     def loading_dgl(t, loading_rate, alpha, t0):
         return (loading_rate / alpha) * (1 - np.exp(-alpha * (t - t0)))
-
-    def magnetic_field_gradient(i):
-        return 1.1E-6 * (90 * i / (8.5 ** 2))  # i: current in Ampere, units: T/cm
 
     mask_array = [(6.3, 10), (3.9, 9.9), (0.39, 9.8), (0.29, 10.8), (0.244, 10.67), (3.634, 13.5), (0.2705, 10.4),
                   (-0.195, 10.16), (-0.0872, 10.16), (0.187, 10.7), (0.176, 10.86), (0.2903, 10.48), (0.2384, 10.83),
@@ -192,29 +189,62 @@ def main(argv: list) -> int:
                        r"Loss rate L $[\frac{1}{s}]$ vs. Detuning Frequency [MHz]"
                           , r"$N_{max} \ [-]$ vs. Detuning Frequency [MHz]"])
     ylabels = np.array([r"$\alpha \ [\frac{1}{s}]$", r"Loss rate L $[\frac{1}{s}]$", r"$N_{max} \ [-]$"])
-    for z in range(1, 4):
-        i = 1
-        plt.errorbar(detuning_calculator(np.array([109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
-                     all_fit_params[z - 1][6 * (i - 1): (6 * i)],
-                     label="(9.0 +/- 0.1)A", yerr=delta_all_fit_params[z - 1][6 * (i - 1): (6 * i)], fmt=".")
-        plt.xlabel("Detuning [MHz]")
-        plt.ylabel(ylabels[z - 1])
-        i = 2
-        plt.errorbar(detuning_calculator(np.array([109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
-                     all_fit_params[z - 1][6 * (i - 1): (6 * i)],
-                     label="(9.5 +/- 0.1)A", yerr=delta_all_fit_params[z - 1][6 * (i - 1): (6 * i)], fmt=".")
-        i = 3
-        plt.errorbar(detuning_calculator(np.array([109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
-                     all_fit_params[z - 1][6 * (i - 1): (6 * i)],
-                     label="(10.0 +/- 0.1)A", yerr=delta_all_fit_params[z - 1][6 * (i - 1): (6 * i)], fmt=".")
-        i = 4
-        plt.errorbar(detuning_calculator(np.array([109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
-                     all_fit_params[z - 1][6 * (i - 1): (6 * i)],
-                     label="(10.35 +/- 0.1)A", yerr=delta_all_fit_params[z - 1][6 * (i - 1): (6 * i)], fmt=".")
-        plt.title(titles[z - 1])
-        plt.legend()
-        plt.show()
 
+    # for z in range(1, 4):
+    #     i = 1
+    #     plt.errorbar(detuning_calculator(np.array([109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
+    #                  all_fit_params[z - 1][6 * (i - 1): (6 * i)],
+    #                  label="(9.0 +/- 0.1)A", yerr=delta_all_fit_params[z - 1][6 * (i - 1): (6 * i)], fmt=".")
+    #     plt.xlabel("Detuning [MHz]")
+    #     plt.ylabel(ylabels[z - 1])
+    #     i = 2
+    #     plt.errorbar(detuning_calculator(np.array([109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
+    #                  all_fit_params[z - 1][6 * (i - 1): (6 * i)],
+    #                  label="(9.5 +/- 0.1)A", yerr=delta_all_fit_params[z - 1][6 * (i - 1): (6 * i)], fmt=".")
+    #     i = 3
+    #     plt.errorbar(detuning_calculator(np.array([109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
+    #                  all_fit_params[z - 1][6 * (i - 1): (6 * i)],
+    #                  label="(10.0 +/- 0.1)A", yerr=delta_all_fit_params[z - 1][6 * (i - 1): (6 * i)], fmt=".")
+    #     i = 4
+    #     plt.errorbar(detuning_calculator(np.array([109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
+    #                  all_fit_params[z - 1][6 * (i - 1): (6 * i)],
+    #                  label="(10.35 +/- 0.1)A", yerr=delta_all_fit_params[z - 1][6 * (i - 1): (6 * i)], fmt=".")
+    #     plt.title(titles[z - 1])
+    #     plt.legend()
+    #     plt.show()
+    def magnetic_field_gradient(current):
+        return (1.1E-6 * (90 * current / (8.5 ** 2))) /(10**-6)  # i: current in Ampere, units: mikroT/cm
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(detuning_calculator(np.array(
+        [109.75, 110.25, 110.75, 111.25, 111.75, 112.25, 109.75, 110.25, 110.75, 111.25, 111.75, 112.25, 109.75, 110.25,
+         110.75, 111.25, 111.75, 112.25, 109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
+                   magnetic_field_gradient(np.array(
+                       [9, 9, 9, 9, 9, 9, 9.5, 9.5, 9.5, 9.5, 9.5, 9.5, 10, 10, 10, 10, 10, 10, 10.35, 10.35, 10.35,
+                        10.35, 10.35, 10.35])), N_max)
+    ax.plot(detuning_calculator(np.array(
+        [109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
+        magnetic_field_gradient(np.array(
+            [9, 9, 9, 9, 9, 9])), N_max[0:6], label= "9.0 +/- 0.1 A")
+    ax.plot(detuning_calculator(np.array(
+        [109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
+        magnetic_field_gradient(np.array(
+            [9.5, 9.5, 9.5, 9.5, 9.5, 9.5])), N_max[6:12], label= "9.5 +/- 0.1 A")
+    ax.plot(detuning_calculator(np.array(
+        [109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
+        magnetic_field_gradient(np.array(
+            [10, 10, 10, 10, 10, 10])), N_max[12:18], label= "10 +/- 0.1 A")
+    ax.plot(detuning_calculator(np.array(
+        [109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
+        magnetic_field_gradient(np.array(
+            [10.35, 10.35, 10.35, 10.35, 10.35, 10.35])), N_max[18:24], label= "10.35 +/- 0.1 A")
+    ax.set_xlabel('Detuning Frequency [MHz]')
+    ax.set_ylabel(r'Magnetic Field Gradient [$\frac{\mu T}{cm}$]')
+    ax.set_zlabel(r'$N_{max}$')
+    plt.legend()
+    plt.savefig("3dplot.pdf", format="pdf")
+    plt.show()
     return 0
 
 
