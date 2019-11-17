@@ -37,10 +37,6 @@ def voltage_to_freq(v):
     return v / dVdf
 
 
-def u_to_kg(m):
-    return 1.66053904e-27 * m
-
-
 def get_data(filename: str):
     with open(filename, "r") as f:
         for i, line in enumerate(f):

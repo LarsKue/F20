@@ -6,6 +6,10 @@ from math import isclose
 import numpy as np
 
 
+def u_to_kg(m):
+    return 1.66053904e-27 * m
+
+
 def modify_data(modifier: Callable, *data):
     """ Apply a modifier function to every item in a dataset """
     for d in data:
