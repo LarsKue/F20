@@ -98,64 +98,122 @@ def main(argv: list) -> int:
         return 1.1E-6 * (90 * i / (8.5 ** 2))  # i: current in Ampere, units: T/cm
 
     mask_array = [(6.3, 10), (3.9, 9.9), (0.39, 9.8), (0.29, 10.8), (0.244, 10.67), (3.634, 13.5), (0.2705, 10.4),
-                  (-0.195, 10.16), (-0.0872, 10.16), (0.56, 10.7), (0.506, 10.86), (0.2903, 10.48), (0.2384, 10.83),
+                  (-0.195, 10.16), (-0.0872, 10.16), (0.187, 10.7), (0.176, 10.86), (0.2903, 10.48), (0.2384, 10.83),
                   (0.29, 10.0684), (0.304, 10.5282), (0.452, 10.59), (0.344, 10.5), (0.3077, 9.67), (0.332, 10.31),
                   (0.332, 10.5), (0.2856, 10.79), (0.265, 10.369), (0.344, 10.32), (0.288, 10.34)]
-    L = []
-    delta_L = []
-    A = []
-    delta_A = []
 
-    for i, (xdata, ydata) in enumerate(get_all_data(data_detuning, range(4, 28))):   # oder 28 + 1
-        a, b = mask_array[i]
-        x, y = zip(*list(get_data("data/detuning_coil_curves/F0028CH1.CSV")))
-        y = np.array(y)
+    def fitparameter_getter():
+        L = []
+        delta_L = []
+        A = []
+        delta_A = []
+        N_max = []
+        delta_N_max = []
 
-        # y = np.where(y < 0.07993, 0.08505, y)
-        y = np.mean(y[320:750]) # nominal Background value in volts
-        # print(y)
-        # y = np.where(y > 0.0542, 0.05055, y)
-        y = conv_volts_to_atomnumber(y, 0)
-        # print([conv_volts_to_atomnumber(0.5,0),conv_volts_to_atomnumber(0.5,4)])
-        # plt.plot(x[320:750], [y]*len(x[320:750]), marker = ".", linewidth=0)
-        xdata = np.array(xdata)
+        for i, (xdata, ydata) in enumerate(get_all_data(data_detuning, range(4, 28))):  # oder 28 + 1
+            a, b = mask_array[i]
+            x, y = zip(*list(get_data("data/detuning_coil_curves/F0028CH1.CSV")))
+            y = np.array(y)
 
-        ydata = np.array(ydata)
-        ydata = conv_volts_to_atomnumber(ydata, 0)
-        ydata = ydata - y
-        # print(ydata)
-        ydata = np.where(ydata < 0, 0, ydata)
+            # y = np.where(y < 0.07993, 0.08505, y)
+            y = np.mean(y[320:750])  # nominal Background value in volts
+            # print(y)
+            # y = np.where(y > 0.0542, 0.05055, y)
+            y = conv_volts_to_atomnumber(y, 0)
+            # print([conv_volts_to_atomnumber(0.5,0),conv_volts_to_atomnumber(0.5,4)])
+            # plt.plot(x[320:750], [y]*len(x[320:750]), marker = ".", linewidth=0)
+            xdata = np.array(xdata)
 
-        omxdata, omydata = deepcopy(xdata), deepcopy(ydata)
-        n = 5
-        omydata = rolling_mean(omydata, n)
+            ydata = np.array(ydata)
+            ydata = conv_volts_to_atomnumber(ydata, 0)
+            ydata = ydata - y
+            # print(ydata)
+            # ydata = np.where(ydata < 0, 0, ydata)
 
-        @np.vectorize
-        def mask(x):
-            nonlocal a, b
-            return a <= x <= b
+            omxdata, omydata = deepcopy(xdata), deepcopy(ydata)
 
-        # print(a, b)
-        mxdata, mydata = list(omxdata), list(omydata)
-        # print(len(mxdata), len(mydata))
-        mxdata, mydata = tuple(mask_data(mask, mask_rolling_mean(mxdata, n), mydata))
-        popt, pcov = curve_fit(loading_dgl, mxdata, unp.nominal_values(mydata), maxfev=10000)
-        # # plt.plot(mxdata, loading_dgl(mxdata, *popt))
-        # # plt.plot(mxdata, unp.nominal_values(mydata), marker='.', linewidth=0)
-        # # #plt.plot(xdata, unp.nominal_values(ydata), marker=".", linewidth=0)
-        # # plt.xlabel("Time [s]")
-        # # plt.ylabel("Number of Atoms")
-        # # plt.show()
-        #
-        L.append(popt[0])
-        delta_L.append(np.sqrt(pcov[0][0]))
-        A.append(popt[1])
-        delta_A.append(np.sqrt(pcov[1][1]))
+            # n = 5
+            # omydata = rolling_mean(omydata, n)
 
+            @np.vectorize
+            def mask(x):
+                nonlocal a, b
+                return a <= x <= b
+
+            # print(a, b)
+            mxdata, mydata = list(omxdata), list(omydata)
+            # print(len(mxdata), len(mydata))
+            mxdata, mydata = tuple(mask_data(mask, mxdata, mydata))
+            popt, pcov = curve_fit(loading_dgl, mxdata, unp.nominal_values(mydata), maxfev=5000)
+            # plt.plot(mxdata, loading_dgl(mxdata, *popt))
+            # plt.plot(mxdata, unp.nominal_values(mydata), marker='.', linewidth=0)
+            # # plt.plot(xdata, unp.nominal_values(ydata), marker=".", linewidth=0)
+            # plt.xlabel("Time [s]")
+            # plt.ylabel("Number of Atoms")
+            # print("L=", popt[0]," alpha=", popt[1], "N_max=", popt[0]/popt[1])
+            # plt.show()
+            # print(popt[2])
+            L.append(popt[0])
+            delta_L.append(np.sqrt(pcov[0][0]))
+            A.append(popt[1])
+            delta_A.append(np.sqrt(pcov[1][1]))
+            N_max.append(popt[0] / popt[1])
+            delta_N_max.append(
+                unp.std_devs(ufloat(popt[0], np.sqrt(pcov[0][0])) / ufloat(popt[1], np.sqrt(pcov[1][1]))))
+
+        return L, delta_L, A, delta_A, N_max, delta_N_max
+
+    L, delta_L, A, delta_A, N_max, delta_N_max = fitparameter_getter()
     print(A)
     print(delta_A)
     print(L)
     print(delta_L)
+    print(N_max)
+
+    all_fit_params = []
+    all_fit_params.append(A)
+    all_fit_params.append(L)
+    all_fit_params.append(N_max)
+    all_fit_params = np.array(all_fit_params)
+
+    delta_all_fit_params = []
+    delta_all_fit_params.append(delta_A)
+    delta_all_fit_params.append(delta_L)
+    delta_all_fit_params.append(delta_N_max)
+    delta_all_fit_params = np.array(delta_all_fit_params)
+
+    def detuning_calculator(x):
+        return (2 * x) - 60 - (2 * 85)  # Mhz
+
+    # for i in range(1, 4):
+    #     plt.plot(detuning_calculator(np.array([109.75, 110.25, 110.75, 111.25, 111.75, 112.25])), A[6*(i-1): (6*i)])
+    #     plt.show()
+    titles = np.array([r"$\alpha \ [\frac{1}{s}]$ vs. Detuning Frequency [MHz]",
+                       r"Loss rate L $[\frac{1}{s}]$ vs. Detuning Frequency [MHz]"
+                          , r"$N_{max} \ [-]$ vs. Detuning Frequency [MHz]"])
+    ylabels = np.array([r"$\alpha \ [\frac{1}{s}]$", r"Loss rate L $[\frac{1}{s}]$", r"$N_{max} \ [-]$"])
+    for z in range(1, 4):
+        i = 1
+        plt.errorbar(detuning_calculator(np.array([109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
+                     all_fit_params[z - 1][6 * (i - 1): (6 * i)],
+                     label="(9.0 +/- 0.1)A", yerr=delta_all_fit_params[z - 1][6 * (i - 1): (6 * i)], fmt=".")
+        plt.xlabel("Detuning [MHz]")
+        plt.ylabel(ylabels[z - 1])
+        i = 2
+        plt.errorbar(detuning_calculator(np.array([109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
+                     all_fit_params[z - 1][6 * (i - 1): (6 * i)],
+                     label="(9.5 +/- 0.1)A", yerr=delta_all_fit_params[z - 1][6 * (i - 1): (6 * i)], fmt=".")
+        i = 3
+        plt.errorbar(detuning_calculator(np.array([109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
+                     all_fit_params[z - 1][6 * (i - 1): (6 * i)],
+                     label="(10.0 +/- 0.1)A", yerr=delta_all_fit_params[z - 1][6 * (i - 1): (6 * i)], fmt=".")
+        i = 4
+        plt.errorbar(detuning_calculator(np.array([109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
+                     all_fit_params[z - 1][6 * (i - 1): (6 * i)],
+                     label="(10.35 +/- 0.1)A", yerr=delta_all_fit_params[z - 1][6 * (i - 1): (6 * i)], fmt=".")
+        plt.title(titles[z - 1])
+        plt.legend()
+        plt.show()
 
     return 0
 
