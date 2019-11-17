@@ -105,188 +105,147 @@ def main(argv: list) -> int:
         N_max = []
         delta_N_max = []
 
-    #     for i, (xdata, ydata) in enumerate(get_all_data(data_detuning, range(4, 28))):  # oder 28 + 1
-    #         a, b = mask_array[i]
-    #         x, y = zip(*list(get_data("data/detuning_coil_curves/F0028CH1.CSV")))
-    #         y = np.array(y)
-    #
-    #         # y = np.where(y < 0.07993, 0.08505, y)
-    #         y = np.mean(y[320:750])  # nominal Background value in volts
-    #         # print(y)
-    #         # y = np.where(y > 0.0542, 0.05055, y)
-    #         y = conv_volts_to_atomnumber(y, 0)
-    #         # print([conv_volts_to_atomnumber(0.5,0),conv_volts_to_atomnumber(0.5,4)])
-    #         # plt.plot(x[320:750], [y]*len(x[320:750]), marker = ".", linewidth=0)
-    #         xdata = np.array(xdata)
-    #
-    #         ydata = np.array(ydata)
-    #         ydata = conv_volts_to_atomnumber(ydata, 0)
-    #         ydata = ydata - y
-    #         # print(ydata)
-    #         # ydata = np.where(ydata < 0, 0, ydata)
-    #
-    #         omxdata, omydata = deepcopy(xdata), deepcopy(ydata)
-    #
-    #         # n = 5
-    #         # omydata = rolling_mean(omydata, n)
-    #
-    #         @np.vectorize
-    #         def mask(x):
-    #             nonlocal a, b
-    #             return a <= x <= b
-    #
-    #         # print(a, b)
-    #         mxdata, mydata = list(omxdata), list(omydata)
-    #         # print(len(mxdata), len(mydata))
-    #         mxdata, mydata = tuple(mask_data(mask, mxdata, mydata))
-    #         popt, pcov = curve_fit(loading_dgl, mxdata, unp.nominal_values(mydata), maxfev=5000)
-    #         # plt.plot(mxdata, loading_dgl(mxdata, *popt))
-    #         # plt.plot(mxdata, unp.nominal_values(mydata), marker='.', linewidth=0)
-    #         # # plt.plot(xdata, unp.nominal_values(ydata), marker=".", linewidth=0)
-    #         # plt.xlabel("Time [s]")
-    #         # plt.ylabel("Number of Atoms")
-    #         # print("L=", popt[0]," alpha=", popt[1], "N_max=", popt[0]/popt[1])
-    #         # plt.show()
-    #         # print(popt[2])
-    #         L.append(popt[0])
-    #         delta_L.append(np.sqrt(pcov[0][0]))
-    #         A.append(popt[1])
-    #         delta_A.append(np.sqrt(pcov[1][1]))
-    #         N_max.append(popt[0] / popt[1])
-    #         delta_N_max.append(
-    #             unp.std_devs(ufloat(popt[0], np.sqrt(pcov[0][0])) / ufloat(popt[1], np.sqrt(pcov[1][1]))))
-    #
-    #     return L, delta_L, A, delta_A, N_max, delta_N_max
-    #
-    # L, delta_L, A, delta_A, N_max, delta_N_max = fitparameter_getter()
-    # print(A)
-    # print(delta_A)
-    # print(L)
-    # print(delta_L)
-    # print(N_max)
+        for i, (xdata, ydata) in enumerate(get_all_data(data_detuning, range(4, 28))):  # oder 28 + 1
+            a, b = mask_array[i]
+            x, y = zip(*list(get_data("data/detuning_coil_curves/F0028CH1.CSV")))
+            y = np.array(y)
 
-        # ydata = np.array(ydata)
-        # ydata = conv_volts_to_atomnumber(ydata, 0)
-        # ydata = ydata - y
-        # # print(ydata)
-        # # ydata = np.where(ydata < 0, 0, ydata)
-        # # n = 5
-        # # omydata = rolling_mean(omydata, n)
-        #
-        # @np.vectorize
-        # def mask(x):
-        #     nonlocal a, b
-        #     return a <= x <= b
-        #
-        # # print(a, b)
-        # mxdata, mydata = list(xdata), list(ydata)
-        # # print(len(mxdata), len(mydata))
-        # mxdata, mydata = tuple(mask_data(mask, mxdata, mydata))
-        # popt, pcov = curve_fit(loading_dgl, mxdata, unp.nominal_values(mydata), maxfev=5000)
-        # # plt.plot(mxdata, loading_dgl(mxdata, *popt))
-        # # plt.plot(mxdata, unp.nominal_values(mydata), marker='.', linewidth=0)
-        # # # plt.plot(xdata, unp.nominal_values(ydata), marker=".", linewidth=0)
-        # # plt.xlabel("Time [s]")
-        # # plt.ylabel("Number of Atoms")
-        # # print("L=", popt[0]," alpha=", popt[1], "N_max=", popt[0]/popt[1])
-        # # plt.show()
-        # # print(popt[2])
-        # L.append(popt[0])
-        # delta_L.append(np.sqrt(pcov[0][0]))
-        # A.append(popt[1])
-        # delta_A.append(np.sqrt(pcov[1][1]))
-        # N_max.append(popt[0] / popt[1])
-        # delta_N_max.append(
-        #     unp.std_devs(ufloat(popt[0], np.sqrt(pcov[0][0])) / ufloat(popt[1], np.sqrt(pcov[1][1]))))
-        #
-        # return L, delta_L, A, delta_A, N_max, delta_N_max
+            # y = np.where(y < 0.07993, 0.08505, y)
+            y = np.mean(y[320:750])  # nominal Background value in volts
+            # print(y)
+            # y = np.where(y > 0.0542, 0.05055, y)
+            y = conv_volts_to_atomnumber(y, 0)
+            # print([conv_volts_to_atomnumber(0.5,0),conv_volts_to_atomnumber(0.5,4)])
+            # plt.plot(x[320:750], [y]*len(x[320:750]), marker = ".", linewidth=0)
+            xdata = np.array(xdata)
 
-    # L, delta_L, A, delta_A, N_max, delta_N_max = fitparameter_getter()
-    # print(A)
-    # print(delta_A)
-    # print(L)
-    # print(delta_L)
-    # print(N_max)
+            ydata = np.array(ydata)
+            ydata = conv_volts_to_atomnumber(ydata, 0)
+            ydata = ydata - y
+            # print(ydata)
+            # ydata = np.where(ydata < 0, 0, ydata)
 
-    # all_fit_params = []
-    # all_fit_params.append(A)
-    # all_fit_params.append(L)
-    # all_fit_params.append(N_max)
-    # all_fit_params = np.array(all_fit_params)
-    #
-    # delta_all_fit_params = []
-    # delta_all_fit_params.append(delta_A)
-    # delta_all_fit_params.append(delta_L)
-    # delta_all_fit_params.append(delta_N_max)
-    # delta_all_fit_params = np.array(delta_all_fit_params)
+            omxdata, omydata = xdata, ydata
+
+            # n = 5
+            # omydata = rolling_mean(omydata, n)
+
+            @np.vectorize
+            def mask(x):
+                nonlocal a, b
+                return a <= x <= b
+
+            # print(a, b)
+            mxdata, mydata = list(omxdata), list(omydata)
+            # print(len(mxdata), len(mydata))
+            mxdata, mydata = tuple(mask_data(mask, mxdata, mydata))
+            popt, pcov = curve_fit(loading_dgl, mxdata, unp.nominal_values(mydata), maxfev=5000)
+            # plt.plot(mxdata, loading_dgl(mxdata, *popt))
+            # plt.plot(mxdata, unp.nominal_values(mydata), marker='.', linewidth=0)
+            # # plt.plot(xdata, unp.nominal_values(ydata), marker=".", linewidth=0)
+            # plt.xlabel("Time [s]")
+            # plt.ylabel("Number of Atoms")
+            # print("L=", popt[0]," alpha=", popt[1], "N_max=", popt[0]/popt[1])
+            # plt.show()
+            # print(popt[2])
+            L.append(popt[0])
+            delta_L.append(np.sqrt(pcov[0][0]))
+            A.append(popt[1])
+            delta_A.append(np.sqrt(pcov[1][1]))
+            N_max.append(popt[0] / popt[1])
+            delta_N_max.append(
+                unp.std_devs(ufloat(popt[0], np.sqrt(pcov[0][0])) / ufloat(popt[1], np.sqrt(pcov[1][1]))))
+
+        return L, delta_L, A, delta_A, N_max, delta_N_max
+
+    L, delta_L, A, delta_A, N_max, delta_N_max = fitparameter_getter()
+    print(A)
+    print(delta_A)
+    print(L)
+    print(delta_L)
+    print(N_max)
+
+
+
+    all_fit_params = []
+    all_fit_params.append(A)
+    all_fit_params.append(L)
+    all_fit_params.append(N_max)
+    all_fit_params = np.array(all_fit_params)
+
+    delta_all_fit_params = []
+    delta_all_fit_params.append(delta_A)
+    delta_all_fit_params.append(delta_L)
+    delta_all_fit_params.append(delta_N_max)
+    delta_all_fit_params = np.array(delta_all_fit_params)
 
 
     def detuning_calculator(x):
         return (2 * x) - 60 - (2 * 85)  # Mhz
 
-    # for i in range(1, 4):
-    #     plt.plot(detuning_calculator(np.array([109.75, 110.25, 110.75, 111.25, 111.75, 112.25])), A[6*(i-1): (6*i)])
-    #     plt.show()
+    for i in range(1, 4):
+        plt.plot(detuning_calculator(np.array([109.75, 110.25, 110.75, 111.25, 111.75, 112.25])), A[6*(i-1): (6*i)])
+        plt.show()
     titles = np.array([r"$\alpha \ [\frac{1}{s}]$ vs. Detuning Frequency [MHz]",
                        r"Loss rate L $[\frac{1}{s}]$ vs. Detuning Frequency [MHz]"
                           , r"$N_{max} \ [-]$ vs. Detuning Frequency [MHz]"])
     ylabels = np.array([r"$\alpha \ [\frac{1}{s}]$", r"Loss rate L $[\frac{1}{s}]$", r"$N_{max} \ [-]$"])
 
-    # for z in range(1, 4):
-    #     i = 1
-    #     plt.errorbar(detuning_calculator(np.array([109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
-    #                  all_fit_params[z - 1][6 * (i - 1): (6 * i)],
-    #                  label="(9.0 +/- 0.1)A", yerr=delta_all_fit_params[z - 1][6 * (i - 1): (6 * i)], fmt=".")
-    #     plt.xlabel("Detuning [MHz]")
-    #     plt.ylabel(ylabels[z - 1])
-    #     i = 2
-    #     plt.errorbar(detuning_calculator(np.array([109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
-    #                  all_fit_params[z - 1][6 * (i - 1): (6 * i)],
-    #                  label="(9.5 +/- 0.1)A", yerr=delta_all_fit_params[z - 1][6 * (i - 1): (6 * i)], fmt=".")
-    #     i = 3
-    #     plt.errorbar(detuning_calculator(np.array([109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
-    #                  all_fit_params[z - 1][6 * (i - 1): (6 * i)],
-    #                  label="(10.0 +/- 0.1)A", yerr=delta_all_fit_params[z - 1][6 * (i - 1): (6 * i)], fmt=".")
-    #     i = 4
-    #     plt.errorbar(detuning_calculator(np.array([109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
-    #                  all_fit_params[z - 1][6 * (i - 1): (6 * i)],
-    #                  label="(10.35 +/- 0.1)A", yerr=delta_all_fit_params[z - 1][6 * (i - 1): (6 * i)], fmt=".")
-    #     plt.title(titles[z - 1])
-    #     plt.legend()
-    #     plt.show()
+    for z in range(1, 4):
+        i = 1
+        plt.errorbar(detuning_calculator(np.array([109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
+                     all_fit_params[z - 1][6 * (i - 1): (6 * i)],
+                     label="(9.0 +/- 0.1)A", yerr=delta_all_fit_params[z - 1][6 * (i - 1): (6 * i)], fmt=".")
+        plt.xlabel("Detuning [MHz]")
+        plt.ylabel(ylabels[z - 1])
+        i = 2
+        plt.errorbar(detuning_calculator(np.array([109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
+                     all_fit_params[z - 1][6 * (i - 1): (6 * i)],
+                     label="(9.5 +/- 0.1)A", yerr=delta_all_fit_params[z - 1][6 * (i - 1): (6 * i)], fmt=".")
+        i = 3
+        plt.errorbar(detuning_calculator(np.array([109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
+                     all_fit_params[z - 1][6 * (i - 1): (6 * i)],
+                     label="(10.0 +/- 0.1)A", yerr=delta_all_fit_params[z - 1][6 * (i - 1): (6 * i)], fmt=".")
+        i = 4
+        plt.errorbar(detuning_calculator(np.array([109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
+                     all_fit_params[z - 1][6 * (i - 1): (6 * i)],
+                     label="(10.35 +/- 0.1)A", yerr=delta_all_fit_params[z - 1][6 * (i - 1): (6 * i)], fmt=".")
+        plt.title(titles[z - 1])
+        plt.legend()
+        plt.show()
     def magnetic_field_gradient(current):
         return (1.1E-6 * (90 * current / (8.5 ** 2))) / (10 ** -6)  # i: current in Ampere, units: mikroT/cm
 
-    # fig = plt.figure()
-    # ax = fig.add_subplot(111, projection='3d')
-    # ax.scatter(detuning_calculator(np.array(
-    #     [109.75, 110.25, 110.75, 111.25, 111.75, 112.25, 109.75, 110.25, 110.75, 111.25, 111.75, 112.25, 109.75, 110.25,
-    #      110.75, 111.25, 111.75, 112.25, 109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
-    #                magnetic_field_gradient(np.array(
-    #                    [9, 9, 9, 9, 9, 9, 9.5, 9.5, 9.5, 9.5, 9.5, 9.5, 10, 10, 10, 10, 10, 10, 10.35, 10.35, 10.35,
-    #                     10.35, 10.35, 10.35])), N_max)
-    # ax.plot(detuning_calculator(np.array(
-    #     [109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
-    #     magnetic_field_gradient(np.array(
-    #         [9, 9, 9, 9, 9, 9])), N_max[0:6], label= "9.0 +/- 0.1 A")
-    # ax.plot(detuning_calculator(np.array(
-    #     [109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
-    #     magnetic_field_gradient(np.array(
-    #         [9.5, 9.5, 9.5, 9.5, 9.5, 9.5])), N_max[6:12], label= "9.5 +/- 0.1 A")
-    # ax.plot(detuning_calculator(np.array(
-    #     [109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
-    #     magnetic_field_gradient(np.array(
-    #         [10, 10, 10, 10, 10, 10])), N_max[12:18], label= "10 +/- 0.1 A")
-    # ax.plot(detuning_calculator(np.array(
-    #     [109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
-    #     magnetic_field_gradient(np.array(
-    #         [10.35, 10.35, 10.35, 10.35, 10.35, 10.35])), N_max[18:24], label= "10.35 +/- 0.1 A")
-    # ax.set_xlabel('Detuning Frequency [MHz]')
-    # ax.set_ylabel(r'Magnetic Field Gradient [$\frac{\mu T}{cm}$]')
-    # ax.set_zlabel(r'$N_{max}$')
-    # plt.legend()
-    # plt.savefig("3dplot.pdf", format="pdf")
-    # plt.show()
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(detuning_calculator(np.array(
+        [109.75, 110.25, 110.75, 111.25, 111.75, 112.25, 109.75, 110.25, 110.75, 111.25, 111.75, 112.25, 109.75, 110.25,
+         110.75, 111.25, 111.75, 112.25, 109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
+                   magnetic_field_gradient(np.array(
+                       [9, 9, 9, 9, 9, 9, 9.5, 9.5, 9.5, 9.5, 9.5, 9.5, 10, 10, 10, 10, 10, 10, 10.35, 10.35, 10.35,
+                        10.35, 10.35, 10.35])), N_max)
+    ax.plot(detuning_calculator(np.array(
+        [109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
+        magnetic_field_gradient(np.array(
+            [9, 9, 9, 9, 9, 9])), N_max[0:6], label= "9.0 +/- 0.1 A")
+    ax.plot(detuning_calculator(np.array(
+        [109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
+        magnetic_field_gradient(np.array(
+            [9.5, 9.5, 9.5, 9.5, 9.5, 9.5])), N_max[6:12], label= "9.5 +/- 0.1 A")
+    ax.plot(detuning_calculator(np.array(
+        [109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
+        magnetic_field_gradient(np.array(
+            [10, 10, 10, 10, 10, 10])), N_max[12:18], label= "10 +/- 0.1 A")
+    ax.plot(detuning_calculator(np.array(
+        [109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
+        magnetic_field_gradient(np.array(
+            [10.35, 10.35, 10.35, 10.35, 10.35, 10.35])), N_max[18:24], label= "10.35 +/- 0.1 A")
+    ax.set_xlabel('Detuning Frequency [MHz]')
+    ax.set_ylabel(r'Magnetic Field Gradient [$\frac{\mu T}{cm}$]')
+    ax.set_zlabel(r'$N_{max}$')
+    plt.legend()
+    plt.savefig("3dplot.pdf", format="pdf")
+    plt.show()
     # return 0
     titles_load_curve = np.array(
         ["10ms", "5ms", "3ms", "7ms", "9ms", "12ms", "11ms", "13ms", "14ms", "15ms", "16ms", "17ms", "18ms", "19ms",
@@ -336,11 +295,11 @@ def main(argv: list) -> int:
         xdata, ydata = list(xdata), list(ydata)
         m1xdata, m1ydata = tuple(mask_data(mask1, xdata, ydata))
         m2xdata, m2ydata = tuple(mask_data(mask2, xdata, ydata))
-        # plt.plot(mxdata, mydata)
-        # plt.plot(xdata, ydata , marker=".", linewidth=0)
-        # plt.title(titles_load_curve[i] + " Down time")
-        # plt.xlabel("time [ms]")
-        # plt.ylabel("Intensity [a.u.]")
+
+        plt.plot(xdata, ydata , marker=".", linewidth=0)
+        plt.title(titles_load_curve[i] + " Down time")
+        plt.xlabel("time [ms]")
+        plt.ylabel("Intensity [a.u.]")
         plt.show()
         averages_N0.append(np.mean(m1ydata))
         std_devs_N0.append(np.std(m1ydata))
