@@ -73,23 +73,9 @@ def conv_volts_to_atomnumber(V_out, entry_in_detunings):
             780E-9))
 
     return conversion_to_atoms(V_out, entry_in_detunings)
-    # print(conversion_to_atoms(0.5, 0))
-
-    # print("hier", detunings)
-    #
-    # return
 
 
 def main(argv: list) -> int:
-    # print(list(get_data(data_folder + "F0004CH1.CSV")))
-
-    # for xdata, ydata in get_all_data(data_folder, range(4, 42 + 1), [18]):
-    #     plt.plot(xdata, ydata)
-    #     plt.show()
-    #
-    #     print(xdata)
-    #     print(ydata)
-    #     print()
 
     def loading_dgl(t, loading_rate, alpha, t0):
         return (loading_rate / alpha) * (1 - np.exp(-alpha * (t - t0)))
@@ -126,9 +112,6 @@ def main(argv: list) -> int:
             ydata = ydata - y
             # print(ydata)
             # ydata = np.where(ydata < 0, 0, ydata)
-
-            omxdata, omydata = deepcopy(xdata), deepcopy(ydata)
-
             # n = 5
             # omydata = rolling_mean(omydata, n)
 
@@ -138,7 +121,7 @@ def main(argv: list) -> int:
                 return a <= x <= b
 
             # print(a, b)
-            mxdata, mydata = list(omxdata), list(omydata)
+            mxdata, mydata = list(xdata), list(ydata)
             # print(len(mxdata), len(mydata))
             mxdata, mydata = tuple(mask_data(mask, mxdata, mydata))
             popt, pcov = curve_fit(loading_dgl, mxdata, unp.nominal_values(mydata), maxfev=5000)
@@ -213,32 +196,32 @@ def main(argv: list) -> int:
     #     plt.legend()
     #     plt.show()
     def magnetic_field_gradient(current):
-        return (1.1E-6 * (90 * current / (8.5 ** 2))) /(10**-6)  # i: current in Ampere, units: mikroT/cm
+        return (1.1E-6 * (90 * current / (8.5 ** 2))) / (10 ** -6)  # i: current in Ampere, units: mikroT/cm
 
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     ax.scatter(detuning_calculator(np.array(
         [109.75, 110.25, 110.75, 111.25, 111.75, 112.25, 109.75, 110.25, 110.75, 111.25, 111.75, 112.25, 109.75, 110.25,
          110.75, 111.25, 111.75, 112.25, 109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
-                   magnetic_field_gradient(np.array(
-                       [9, 9, 9, 9, 9, 9, 9.5, 9.5, 9.5, 9.5, 9.5, 9.5, 10, 10, 10, 10, 10, 10, 10.35, 10.35, 10.35,
-                        10.35, 10.35, 10.35])), N_max)
+        magnetic_field_gradient(np.array(
+            [9, 9, 9, 9, 9, 9, 9.5, 9.5, 9.5, 9.5, 9.5, 9.5, 10, 10, 10, 10, 10, 10, 10.35, 10.35, 10.35,
+             10.35, 10.35, 10.35])), N_max)
     ax.plot(detuning_calculator(np.array(
         [109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
         magnetic_field_gradient(np.array(
-            [9, 9, 9, 9, 9, 9])), N_max[0:6], label= "9.0 +/- 0.1 A")
+            [9, 9, 9, 9, 9, 9])), N_max[0:6], label="9.0 +/- 0.1 A")
     ax.plot(detuning_calculator(np.array(
         [109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
         magnetic_field_gradient(np.array(
-            [9.5, 9.5, 9.5, 9.5, 9.5, 9.5])), N_max[6:12], label= "9.5 +/- 0.1 A")
+            [9.5, 9.5, 9.5, 9.5, 9.5, 9.5])), N_max[6:12], label="9.5 +/- 0.1 A")
     ax.plot(detuning_calculator(np.array(
         [109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
         magnetic_field_gradient(np.array(
-            [10, 10, 10, 10, 10, 10])), N_max[12:18], label= "10 +/- 0.1 A")
+            [10, 10, 10, 10, 10, 10])), N_max[12:18], label="10 +/- 0.1 A")
     ax.plot(detuning_calculator(np.array(
         [109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
         magnetic_field_gradient(np.array(
-            [10.35, 10.35, 10.35, 10.35, 10.35, 10.35])), N_max[18:24], label= "10.35 +/- 0.1 A")
+            [10.35, 10.35, 10.35, 10.35, 10.35, 10.35])), N_max[18:24], label="10.35 +/- 0.1 A")
     ax.set_xlabel('Detuning Frequency [MHz]')
     ax.set_ylabel(r'Magnetic Field Gradient [$\frac{\mu T}{cm}$]')
     ax.set_zlabel(r'$N_{max}$')

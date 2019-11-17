@@ -30,11 +30,11 @@ def mask_data(mask: Callable[[Iterable], Sequence], keyarr: Iterable, *data: Lis
     :param mask:    Function that takes an iterable data set and returns a sequence of the size of the data set,
                     with True or False values according to whether that data point should be kept
 
-    :param keyarr:  The array which decides what datapoints should be kept
+    :param keyarr:  The array which decides what data points should be kept
 
     :param data:    Other arrays that shall be masked in the same way
 
-    :param modify_keyarr:   If False, the keyarray will be left as is (but still returned)
+    :param modify_keyarr:   If False, the keyarray will be left as is and won't be yielded
 
     :param output_type_modifier:    For data set conversion between types, e.g. if you give this function a tuple but
                                     want a list, set output_type_modifier=list
@@ -44,13 +44,13 @@ def mask_data(mask: Callable[[Iterable], Sequence], keyarr: Iterable, *data: Lis
     """
     m: List = mask(keyarr)
     if modify_keyarr:
-        result = (x for i, x in enumerate(keyarr) if m[i])
+        result = list(x for i, x in enumerate(keyarr) if m[i])
         if output_type_modifier is None:
             yield type(keyarr)(result)
         else:
             yield output_type_modifier(result)
     for arr in data:
-        result = (x for i, x in enumerate(arr) if m[i])
+        result = list(x for i, x in enumerate(arr) if m[i])
         if output_type_modifier is None:
             yield type(arr)(result)
         else:
