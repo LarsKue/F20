@@ -338,6 +338,18 @@ def main(argv: list) -> int:
     plt.legend()
     plt.savefig("releaserecap.pdf", format="pdf")
     plt.show()
+
+    diffs = (unp.nominal_values(uarray_Nmax / uarray_N0) - fitfunc(down_time, *popt)) / unp.std_devs(uarray_Nmax / uarray_N0)
+    diffs_squared = diffs ** 2
+    chi2 = np.sum(diffs_squared)
+
+    n_data_points = len(down_time)
+    n_fit_parameters = 1
+    n_dof = n_data_points - n_fit_parameters
+
+    print("chi2/ndf = " + str(round(chi2, 2)) + "/" + str(n_dof))
+    print(r"So we get chi2_red$ = ", round(chi2, 2)/n_dof)
+
     return 0
 
 
