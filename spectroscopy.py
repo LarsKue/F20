@@ -242,9 +242,8 @@ def lorentzfit(lorentz_data, plot=True, return_gammas=False):
 
 
 def hyperfine(plot=True, log=True):
-
     # some estimates will be shifted right or left in order not to find the wrong peak
-    x0_arr = [[0.209736, 0.216923, 0.219873, 0.226917],
+    x0_arr = [[0.209736, 0.2124, 0.216923, 0.219873, 0.226917],
               [0.319, 0.327099, 0.332584, 0.339475, 0.352864],
               [0.654384, 0.6627, 0.672215, 0.679843, 0.6976],
               [0.07777, 0.0952475, 0.107574, 0.125365, 0.154338]]
@@ -261,7 +260,11 @@ def hyperfine(plot=True, log=True):
 
         peaks = unp.uarray(peaks, delta_peaks)
         if log:
-            print("peaks:", peaks)
+            # print("peaks:", peaks)
+            print("Separation in MHz:")
+            for x in voltage_to_freq(np.diff(peaks)) * 1e-6:
+                print("{}".format(x))
+            # print("{}".format(voltage_to_freq(np.diff(peaks)) * 1e-6))
 
         if plot:
             fig, ax1 = plt.subplots(figsize=(10, 8))
@@ -288,12 +291,41 @@ def hyperfine(plot=True, log=True):
 
             plt.show()
 
+    values = [74, 137, 92, 131, 223, 305]
+    lvalues = [63.40161, 120.64068, 72.218040, 156.947070, 229.16511, 266.650090]
+    deltas = [5, 7, 10, 10, 10, 13]
+
+    for v, l, d in zip(values, lvalues, deltas):
+        sig = abs(v - l) / d
+        print(sig)
+
+
+"""
+
+Separations:
+
+    Note: I declared the very left peak in 87F1 to be the F'=0 peak, though this is controversial,
+    since the peak to the right of the F'=1 peak is not visible in the spectrum then, although it
+    should be much bigger than the F'=0 peak.
+    
+    84F2 -> F':
+    
+    Isotope     F       F'1     F'2     experimental value (MHz)    literature value (MHz)      sigma       Notes
+    85          2       2       3       74 +/- 5                    63.401(61)                  2.1
+    85          3       3       4       137 +/- 7                   120.640(68)                 2.3
+    87          1       0       1       92 +/- 10                   72.2180(40)                 2.0         uncertain if this is the right peak
+    87          1       1       2       131 +/- 10                  156.9470(70)                2.6         uncertain if this is the right peak
+    87          1       0       2       223 +/- 10                  229.165(11)                 0.62        uncertain if this is the right peak
+    87          2       2       3       305 +/- 13                  266.6500(90)                2.9
+    
+"""
+
 
 def main(argv: list) -> int:
     calibration(plot=False, log=False)
     lorentz_data = list(get_lorentz_data(plot=False, log=False))
     lorentzfit(lorentz_data, plot=False)
-    hyperfine(plot=True, log=False)
+    hyperfine(plot=True, log=True)
     return 0
 
 
