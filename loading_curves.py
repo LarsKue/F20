@@ -2,6 +2,9 @@ import sys
 
 import math
 import numpy as np
+from math import erf
+import scipy.special
+from scipy.constants import Avogadro, k
 from matplotlib import pyplot as plt
 from uncertainties import ufloat
 from uncertainties import unumpy as unp
@@ -13,7 +16,7 @@ from copy import deepcopy
 
 from utils import *
 
-data_folder = "data/loading_curves/"
+data_folder = "data/loading_curves_reformatted/"
 data_detuning = "data/detuning_coil_curves/"
 
 
@@ -76,6 +79,15 @@ def conv_volts_to_atomnumber(V_out, entry_in_detunings):
 
 
 def main(argv: list) -> int:
+    # print(list(get_data(data_folder + "F0004CH1.CSV")))
+
+    # for xdata, ydata in get_all_data(data_folder, range(4, 42 + 1), [18]):
+    #     plt.plot(xdata, ydata)
+    #     plt.show()
+    #
+    #     print(xdata)
+    #     print(ydata)
+    #     print()
 
     def loading_dgl(t, loading_rate, alpha, t0):
         return (loading_rate / alpha) * (1 - np.exp(-alpha * (t - t0)))
@@ -112,6 +124,9 @@ def main(argv: list) -> int:
             ydata = ydata - y
             # print(ydata)
             # ydata = np.where(ydata < 0, 0, ydata)
+
+            omxdata, omydata = xdata, ydata
+
             # n = 5
             # omydata = rolling_mean(omydata, n)
 
@@ -121,7 +136,7 @@ def main(argv: list) -> int:
                 return a <= x <= b
 
             # print(a, b)
-            mxdata, mydata = list(xdata), list(ydata)
+            mxdata, mydata = list(omxdata), list(omydata)
             # print(len(mxdata), len(mydata))
             mxdata, mydata = tuple(mask_data(mask, mxdata, mydata))
             popt, pcov = curve_fit(loading_dgl, mxdata, unp.nominal_values(mydata), maxfev=5000)
@@ -150,6 +165,8 @@ def main(argv: list) -> int:
     print(delta_L)
     print(N_max)
 
+
+
     all_fit_params = []
     all_fit_params.append(A)
     all_fit_params.append(L)
@@ -162,39 +179,40 @@ def main(argv: list) -> int:
     delta_all_fit_params.append(delta_N_max)
     delta_all_fit_params = np.array(delta_all_fit_params)
 
+
     def detuning_calculator(x):
         return (2 * x) - 60 - (2 * 85)  # Mhz
 
-    # for i in range(1, 4):
-    #     plt.plot(detuning_calculator(np.array([109.75, 110.25, 110.75, 111.25, 111.75, 112.25])), A[6*(i-1): (6*i)])
-    #     plt.show()
+    for i in range(1, 4):
+        plt.plot(detuning_calculator(np.array([109.75, 110.25, 110.75, 111.25, 111.75, 112.25])), A[6*(i-1): (6*i)])
+        plt.show()
     titles = np.array([r"$\alpha \ [\frac{1}{s}]$ vs. Detuning Frequency [MHz]",
                        r"Loss rate L $[\frac{1}{s}]$ vs. Detuning Frequency [MHz]"
                           , r"$N_{max} \ [-]$ vs. Detuning Frequency [MHz]"])
     ylabels = np.array([r"$\alpha \ [\frac{1}{s}]$", r"Loss rate L $[\frac{1}{s}]$", r"$N_{max} \ [-]$"])
 
-    # for z in range(1, 4):
-    #     i = 1
-    #     plt.errorbar(detuning_calculator(np.array([109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
-    #                  all_fit_params[z - 1][6 * (i - 1): (6 * i)],
-    #                  label="(9.0 +/- 0.1)A", yerr=delta_all_fit_params[z - 1][6 * (i - 1): (6 * i)], fmt=".")
-    #     plt.xlabel("Detuning [MHz]")
-    #     plt.ylabel(ylabels[z - 1])
-    #     i = 2
-    #     plt.errorbar(detuning_calculator(np.array([109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
-    #                  all_fit_params[z - 1][6 * (i - 1): (6 * i)],
-    #                  label="(9.5 +/- 0.1)A", yerr=delta_all_fit_params[z - 1][6 * (i - 1): (6 * i)], fmt=".")
-    #     i = 3
-    #     plt.errorbar(detuning_calculator(np.array([109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
-    #                  all_fit_params[z - 1][6 * (i - 1): (6 * i)],
-    #                  label="(10.0 +/- 0.1)A", yerr=delta_all_fit_params[z - 1][6 * (i - 1): (6 * i)], fmt=".")
-    #     i = 4
-    #     plt.errorbar(detuning_calculator(np.array([109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
-    #                  all_fit_params[z - 1][6 * (i - 1): (6 * i)],
-    #                  label="(10.35 +/- 0.1)A", yerr=delta_all_fit_params[z - 1][6 * (i - 1): (6 * i)], fmt=".")
-    #     plt.title(titles[z - 1])
-    #     plt.legend()
-    #     plt.show()
+    for z in range(1, 4):
+        i = 1
+        plt.errorbar(detuning_calculator(np.array([109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
+                     all_fit_params[z - 1][6 * (i - 1): (6 * i)],
+                     label="(9.0 +/- 0.1)A", yerr=delta_all_fit_params[z - 1][6 * (i - 1): (6 * i)], fmt=".")
+        plt.xlabel("Detuning [MHz]")
+        plt.ylabel(ylabels[z - 1])
+        i = 2
+        plt.errorbar(detuning_calculator(np.array([109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
+                     all_fit_params[z - 1][6 * (i - 1): (6 * i)],
+                     label="(9.5 +/- 0.1)A", yerr=delta_all_fit_params[z - 1][6 * (i - 1): (6 * i)], fmt=".")
+        i = 3
+        plt.errorbar(detuning_calculator(np.array([109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
+                     all_fit_params[z - 1][6 * (i - 1): (6 * i)],
+                     label="(10.0 +/- 0.1)A", yerr=delta_all_fit_params[z - 1][6 * (i - 1): (6 * i)], fmt=".")
+        i = 4
+        plt.errorbar(detuning_calculator(np.array([109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
+                     all_fit_params[z - 1][6 * (i - 1): (6 * i)],
+                     label="(10.35 +/- 0.1)A", yerr=delta_all_fit_params[z - 1][6 * (i - 1): (6 * i)], fmt=".")
+        plt.title(titles[z - 1])
+        plt.legend()
+        plt.show()
     def magnetic_field_gradient(current):
         return (1.1E-6 * (90 * current / (8.5 ** 2))) / (10 ** -6)  # i: current in Ampere, units: mikroT/cm
 
@@ -203,31 +221,135 @@ def main(argv: list) -> int:
     ax.scatter(detuning_calculator(np.array(
         [109.75, 110.25, 110.75, 111.25, 111.75, 112.25, 109.75, 110.25, 110.75, 111.25, 111.75, 112.25, 109.75, 110.25,
          110.75, 111.25, 111.75, 112.25, 109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
-        magnetic_field_gradient(np.array(
-            [9, 9, 9, 9, 9, 9, 9.5, 9.5, 9.5, 9.5, 9.5, 9.5, 10, 10, 10, 10, 10, 10, 10.35, 10.35, 10.35,
-             10.35, 10.35, 10.35])), N_max)
+                   magnetic_field_gradient(np.array(
+                       [9, 9, 9, 9, 9, 9, 9.5, 9.5, 9.5, 9.5, 9.5, 9.5, 10, 10, 10, 10, 10, 10, 10.35, 10.35, 10.35,
+                        10.35, 10.35, 10.35])), N_max)
     ax.plot(detuning_calculator(np.array(
         [109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
         magnetic_field_gradient(np.array(
-            [9, 9, 9, 9, 9, 9])), N_max[0:6], label="9.0 +/- 0.1 A")
+            [9, 9, 9, 9, 9, 9])), N_max[0:6], label= "9.0 +/- 0.1 A")
     ax.plot(detuning_calculator(np.array(
         [109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
         magnetic_field_gradient(np.array(
-            [9.5, 9.5, 9.5, 9.5, 9.5, 9.5])), N_max[6:12], label="9.5 +/- 0.1 A")
+            [9.5, 9.5, 9.5, 9.5, 9.5, 9.5])), N_max[6:12], label= "9.5 +/- 0.1 A")
     ax.plot(detuning_calculator(np.array(
         [109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
         magnetic_field_gradient(np.array(
-            [10, 10, 10, 10, 10, 10])), N_max[12:18], label="10 +/- 0.1 A")
+            [10, 10, 10, 10, 10, 10])), N_max[12:18], label= "10 +/- 0.1 A")
     ax.plot(detuning_calculator(np.array(
         [109.75, 110.25, 110.75, 111.25, 111.75, 112.25])),
         magnetic_field_gradient(np.array(
-            [10.35, 10.35, 10.35, 10.35, 10.35, 10.35])), N_max[18:24], label="10.35 +/- 0.1 A")
+            [10.35, 10.35, 10.35, 10.35, 10.35, 10.35])), N_max[18:24], label= "10.35 +/- 0.1 A")
     ax.set_xlabel('Detuning Frequency [MHz]')
     ax.set_ylabel(r'Magnetic Field Gradient [$\frac{\mu T}{cm}$]')
     ax.set_zlabel(r'$N_{max}$')
     plt.legend()
     # plt.savefig("3dplot.pdf", format="pdf")
     plt.show()
+    # return 0
+    titles_load_curve = np.array(
+        ["10ms", "5ms", "3ms", "7ms", "9ms", "12ms", "11ms", "13ms", "14ms", "15ms", "16ms", "17ms", "18ms", "19ms",
+         "20ms", "21ms", "22ms", "23ms",
+         "24ms", "25ms", "26ms", "27ms", "28ms", "29ms", "30ms", "40ms", "50ms", "60ms", "70ms", "80ms", "90ms",
+         "100ms"])
+
+    mask_array_N0 = [(-1.14, -0.204), (-1.139, -0.0259), (-1.195, -0.259), (-1.193, -0.244), (-1.138, -0.094),
+                     (-1.194, -0.204), (-1.194, -0.2046), (-1.63, -0.26), (-4.36, -0.63), (-4.47, -0.628),
+                     (-4.259, -0.408), (-4.369, -0.738), (-4.47, -0.29), (-4.259, -0.628), (-4.369, -0.628),
+                     (-4.479, -0.408), (-4.259, -0.408), (-4.479, -0.408), (-4.36, -0.628), (-4.36, -0.298),
+                     (-4.479, -0.298), (-8.73, -1.47), (-8.95, -0.59), (-8.739, -0.59), (-8.739, -0.376),
+                     (-8.739, -0.59), (-22.29, -1.39), (-22.84, -1.39), (-22.84, -3.04), (-23.0, -3.04),
+                     (-22.84, -3.04), (-24.5, -1.39)]
+    mask_array_Nmax = [(10.0295, 10.5798), (5.077, 5.796), (3.041, 4.08), (7.058, 7.77), (9.04, 9.86), (12.06, 12.83),
+                       (11.075, 11.84), (12.99, 19.98), (14.22, 15.21), (15.108, 16.42), (16.2, 17.74), (17.0, 18.4),
+                       (18.18, 19.5), (19.17, 20.61), (20.17, 22.04),
+                       (21.16, 22.59), (22.04, 23.58), (22.15, 23.9),
+                       (24.13, 25.67), (25.012, 26.99), (26.11, 28.31), (27.35, 29.55), (28.45, 31.09), (29.33, 31.75),
+                       (30.43, 33.73), (40.56, 44.08), (50.88, 59.0), (60.23, 67.0), (70.68, 74.0), (81.69, 85.0),
+                       (89.9, 94.0), (100.4, 105.0)]
+
+    averages_N0 = []
+    std_devs_N0 = []
+    averages_Nmax = []
+    std_devs_Nmax = []
+    for i, (xdata, ydata) in enumerate(get_all_data(data_folder, range(4, 36))):
+        a, b = mask_array_N0[i]
+        c, d = mask_array_Nmax[i]
+        x, y = zip(*list(get_data("data/loading_curves/F0011CH1.CSV")))
+        y = np.array(y)
+        y = np.mean(y[1000:1800])
+        xdata = np.array(xdata)
+        xdata = xdata / (10 ** -3)
+        ydata = np.array(ydata) - y
+
+        @np.vectorize
+        def mask1(x):
+            nonlocal a, b
+            return a <= x <= b
+
+        @np.vectorize
+        def mask2(x):
+            nonlocal c, d
+            return c <= x <= d
+
+        xdata, ydata = list(xdata), list(ydata)
+        m1xdata, m1ydata = tuple(mask_data(mask1, xdata, ydata))
+        m2xdata, m2ydata = tuple(mask_data(mask2, xdata, ydata))
+
+        plt.plot(xdata, ydata , marker=".", linewidth=0)
+        plt.title(titles_load_curve[i] + " Down time")
+        plt.xlabel("time [ms]")
+        plt.ylabel("Intensity [a.u.]")
+        plt.show()
+        averages_N0.append(np.mean(m1ydata))
+        std_devs_N0.append(np.std(m1ydata))
+        averages_Nmax.append(np.mean(m2ydata))
+        std_devs_Nmax.append(np.std(m2ydata))
+    # print(averages_N0)
+    # print(std_devs_N0)
+    uarray_Nmax = unp.uarray(averages_Nmax, std_devs_Nmax)
+    uarray_N0 = unp.uarray(averages_N0, std_devs_N0)
+    print(uarray_Nmax, uarray_N0)
+    down_time = np.array(
+        [10, 5, 3, 7, 9, 12, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 40, 50, 60, 70,
+         80, 90, 100]) * 10 ** -3
+
+    down_time, uarray_N0, uarray_Nmax = tuple(sort_together(down_time, uarray_N0, uarray_Nmax))
+    uarray_N0 = np.array(uarray_N0)
+    uarray_Nmax = np.array(uarray_Nmax)
+    down_time = np.array(down_time)
+    plt.errorbar(down_time, unp.nominal_values(uarray_Nmax / uarray_N0), marker=".",
+                 yerr=unp.std_devs(uarray_Nmax / uarray_N0), label="data points")
+
+    def fitfunc(x, temp):
+        M = (85.4678 * (1.6605e-27))  # kg
+        chi = np.sqrt(M / (k * temp)) * ((1.5e-3) / (x))
+
+        return scipy.special.erf(chi) - ((2 / np.sqrt(np.pi)) * chi * np.exp(-(chi ** 2)))
+
+    popt, pcov = curve_fit(fitfunc, down_time, unp.nominal_values(uarray_Nmax / uarray_N0),
+                           sigma=unp.std_devs(uarray_Nmax / uarray_N0))
+
+    plt.plot(down_time, fitfunc(down_time, *popt), label = r"Fit of $\frac{N(t)}{N_0} \ = \ erf(\chi) \ - \ \frac{2}{\sqrt{\pi}}\chi e^{-\chi^2}$")
+    print("We get a MOT-Temperature of:", "(",popt[0] * 10 ** 6, "+-", np.sqrt(pcov[0][0]) * 10 ** 6,") micro Kelvin")
+    plt.title("Fraction of Recaptured Atoms vs. Down Time")
+    plt.xlabel("down time [s]")
+    plt.ylabel(r"$\frac{N(t)}{N_0}$")
+    plt.legend()
+    plt.savefig("releaserecap.pdf", format="pdf")
+    plt.show()
+
+    diffs = (unp.nominal_values(uarray_Nmax / uarray_N0) - fitfunc(down_time, *popt)) / unp.std_devs(uarray_Nmax / uarray_N0)
+    diffs_squared = diffs ** 2
+    chi2 = np.sum(diffs_squared)
+
+    n_data_points = len(down_time)
+    n_fit_parameters = 1
+    n_dof = n_data_points - n_fit_parameters
+
+    print("chi2/ndf = " + str(round(chi2, 2)) + "/" + str(n_dof))
+    print(r"So we get chi2_red$ = ", round(chi2, 2)/n_dof)
+
     return 0
 
 
