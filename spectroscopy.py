@@ -12,7 +12,6 @@ from typing import Callable, List
 
 from utils import *
 
-
 data_folder = "data/spectroscopy/"
 
 
@@ -198,26 +197,17 @@ def lorentzfit(lorentz_data, plot=True, return_gammas=False):
     for i in range(len(lorentz_data)):
         lorentz_data[i] = tuple(np.array(x) for x in lorentz_data[i])
 
-    """ HIER WERTE ÄNDERN """
-
-    # die hier sind aus dem PDF
+    # these values are from the pdf
     mask_ranges = [[(0.252, 0.2575), None, (0.2700, 0.2747)],
                    [(-0.2856, -0.28158), (-0.2785, -0.2745), (-0.2535, -0.2471)],
                    [(0.66, 0.675), (0.6772, 0.6863), (0.7000, 0.7142)],
                    [None, (0.1551, 0.1665), (0.2022, 0.2119)]]
 
-    # works
-    # starting_values = [[[0.2555, 0.003, 0.03, 0.015], None, [0.272, 0.003, 0.004, 0.021]],
-    #                    [[-0.283, 0.003, 0.009, 0.019], [-0.276, 0.003, 0.005, 0.0275], [-0.250, 0.003, 0.008, 0.02]],
-    #                    [[0.666, 0.005, 0.0065, 0.0028], None, [0.706, 0.003, 0.008, 0.008]],
-    #                    [None, [0.160, 0.003, 0.0065, 0.0035], [0.206, 0.003, 0.02, 0.005]]]
-
     starting_values = [[[0.2555, 0.003, 0.03, 0.015, 0], None, [0.272, 0.003, 0.004, 0.021, 0]],
-                       [[-0.283, 0.003, 0.009, 0.019, 0], [-0.276, 0.003, 0.005, 0.0275, 0], [-0.250, 0.003, 0.008, 0.02, 0]],
+                       [[-0.283, 0.003, 0.009, 0.019, 0], [-0.276, 0.003, 0.005, 0.0275, 0],
+                        [-0.250, 0.003, 0.008, 0.02, 0]],
                        [[0.666, 0.005, 0.0065, 0.0028, 1], None, [0.706, 0.003, 0.008, 0.008, 1]],
                        [None, [0.160, 0.003, 0.0065, 0.0035, -0.5], [0.206, 0.003, 0.02, 0.005, 0]]]
-
-    """ AB HIER NICHT MEHR WERTE ÄNDERN """
 
     gammas = []
 
@@ -251,61 +241,61 @@ def lorentzfit(lorentz_data, plot=True, return_gammas=False):
         return gammas
 
 
-def hyperfine(plot=True):
+def hyperfine(plot=True, log=True):
 
-    for data_out, data_in, pdh in get_hyperfine_data(plot=False):
+    # some estimates will be shifted right or left in order not to find the wrong peak
+    x0_arr = [[0.209736, 0.216923, 0.219873, 0.226917],
+              [0.319, 0.327099, 0.332584, 0.339475, 0.352864],
+              [0.654384, 0.6627, 0.672215, 0.679843, 0.6976],
+              [0.07777, 0.0952475, 0.107574, 0.125365, 0.154338]]
+
+    for x0, (data_out, data_in, pdh) in zip(x0_arr, get_hyperfine_data(plot=False)):
         mean_N = 20
         smooth_pdh = np.array(rolling_mean(pdh, mean_N))
 
         # find solutions for phd
-        peaks = dsolve(np.array(mask_rolling_mean(data_out, mean_N)), smooth_pdh, x0=np.linspace(min(data_out) + 0.1 * abs(min(data_out)), max(data_out) - 0.1 * abs(max(data_out)), 11))
+        peaks = dsolve(np.array(mask_rolling_mean(data_out, mean_N)), smooth_pdh, x0=x0)
 
-        print("peaks:", sorted(peaks))
+        # the uncertainty in the peaks can be estimated by the mean difference in data_out (i.e. mean x-step) and mean_N
+        delta_peaks = np.mean(np.diff(data_out)) * mean_N
 
-        fig, ax1 = plt.subplots(figsize=(10, 8))
-        color = "tab:blue"
-        ax1.set_xlabel("Aux Out [V]")
-        ax1.set_ylabel("Aux In [V]", color=color)
-        ax1.plot(data_out, data_in, color=color)
-        ax1.tick_params(axis="y", labelcolor=color)
+        peaks = unp.uarray(peaks, delta_peaks)
+        if log:
+            print("peaks:", peaks)
 
-        ax2 = ax1.twinx()
-        ax2.axhline(color="red")
+        if plot:
+            fig, ax1 = plt.subplots(figsize=(10, 8))
+            color = "tab:blue"
+            ax1.set_xlabel("Aux Out [V]")
+            ax1.set_ylabel("Aux In [V]", color=color)
+            ax1.plot(data_out, data_in, color=color)
+            # ax1.plot(mask_rolling_mean(data_out, mean_N), smooth_data_in, color=color)
+            ax1.tick_params(axis="y", labelcolor=color)
 
-        for x0 in peaks:
-            plt.axvline(x=x0)
+            ax2 = ax1.twinx()
+            ax2.axhline(color="black", linestyle="--", alpha=0.4)
 
-        color = "tab:green"
-        ax2.set_ylabel("PDH [a.u.]", color=color)
-        ax2.plot(mask_rolling_mean(data_out, mean_N), smooth_pdh, color=color)
-        ax2.tick_params(axis="y", labelcolor=color)
+            for x0 in peaks:
+                plt.axvline(x=x0.nominal_value, color="red", alpha=0.6)
+                plt.axvline(x=x0.nominal_value - x0.std_dev, color="orange", alpha=0.6)
+                plt.axvline(x=x0.nominal_value + x0.std_dev, color="orange", alpha=0.6)
 
-        plt.show()
+            color = "tab:green"
+            ax2.set_ylabel("PDH [a.u.]", color=color)
+            ax2.plot(mask_rolling_mean(data_out, mean_N), smooth_pdh, color=color)
 
-    # smooth_data = pd.rolling_mean(data, 5).plot(style="k")
-    # plt.show()
+            ax2.tick_params(axis="y", labelcolor=color)
 
-    # for i in range(len(data)):
-    #     data[i] = tuple(np.array(x) for x in data[i])
-    #
-    # for data_in, data_out in data:
-    #     plt.plot(data_in, data_out, label="Data")
-    #     plt.xlabel("Aux Out [V]")
-    #     plt.ylabel("Aux In [V]")
-    #     plt.legend()
-    #     plt.show()
+            plt.show()
 
 
 def main(argv: list) -> int:
-    # calibration(log=False)
+    calibration(plot=False, log=False)
     lorentz_data = list(get_lorentz_data(plot=False, log=False))
     lorentzfit(lorentz_data, plot=False)
-    hyperfine()
+    hyperfine(plot=True, log=False)
     return 0
 
 
 if __name__ == "__main__":
     main(sys.argv)
-
-
-

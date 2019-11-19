@@ -226,7 +226,7 @@ def main(argv: list) -> int:
     ax.set_ylabel(r'Magnetic Field Gradient [$\frac{\mu T}{cm}$]')
     ax.set_zlabel(r'$N_{max}$')
     plt.legend()
-    plt.savefig("3dplot.pdf", format="pdf")
+    # plt.savefig("3dplot.pdf", format="pdf")
     plt.show()
     return 0
 

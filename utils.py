@@ -94,12 +94,12 @@ def sort_together(keyarr: [Iterable, Sized], *arrs) -> List:
         yield list(map(arr.__getitem__, idx))
 
 
-def dsolve(xdata: Sequence, ydata: Sequence, *args, **kwargs):
-    """ Solve a given dataset for 0 by interleaving the data points with linear functions"""
-    # need x to be sorted (monotonically increasing) for interleaving
+def interpolate_data(xdata: Sequence, ydata: Sequence) -> Callable:
+    """ Returns a function that interpolates a dataset with linear functions """
+    # need x to be sorted (monotonically increasing)
     xdata, ydata = sort_together(xdata, ydata)
 
-    # helper function that connects data points with a linear function
+    # the interpolating function which we will return
     def f(x):
         if isinstance(x, Iterable):
             return [f(y) for y in x]
@@ -144,7 +144,12 @@ def dsolve(xdata: Sequence, ydata: Sequence, *args, **kwargs):
 
         return dfdx * x + f0
 
-    return fsolve(f, *args, **kwargs)
+    return f
+
+
+def dsolve(xdata: Sequence, ydata: Sequence, *args, **kwargs):
+    """ Solve a given dataset for 0 by interpolating the data points with linear functions"""
+    return fsolve(interpolate_data(xdata, ydata), *args, **kwargs)
 
 
 def average_close_points(xdata, ydata, delta):
