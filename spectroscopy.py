@@ -54,6 +54,7 @@ def calibration(plot=True, log=True):
     data_out, data_in, pdh = zip(*list(get_data(data_folder + "fullspectrum.txt")))
 
     if plot:
+        plt.figure(figsize=(8, 6))
         plt.plot(data_out, data_in)
 
     voltages = []
@@ -324,9 +325,9 @@ Separations:
 
 
 def main(argv: list) -> int:
-    calibration(plot=False, log=False)
-    lorentz_data = list(get_lorentz_data(plot=False, log=False))
-    lorentzfit(lorentz_data, plot=False)
+    calibration(plot=True, log=True)
+    lorentz_data = list(get_lorentz_data(plot=True, log=True))
+    lorentzfit(lorentz_data, plot=True)
     hyperfine(plot=True, log=True)
     return 0
 
