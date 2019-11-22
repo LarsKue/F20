@@ -10,6 +10,7 @@ from scipy.stats import chi2
 
 from typing import Callable, List
 
+from utils import *
 
 data_folder = "data/spectroscopy/"
 
@@ -24,11 +25,6 @@ def lorentzian(x, x0, gamma, amp, y0, a):
     return a * x + y0 + amp * gamma ** 2 / (((x - x0) ** 2 + gamma ** 2) * np.pi * gamma)
 
 
-def modify_data(modifier, *data):
-    for d in data:
-        yield type(d)(modifier(x) for x in d)
-
-
 # virgin function from script
 # def lorentzian(x, x0, gamma, amp, y0):
 #     return y0 + (amp / (1 + (4 * (x - x0) ** 2 / gamma ** 2)))
@@ -40,27 +36,6 @@ def voltage_to_freq(v):
     return v / dVdf
 
 
-def u_to_kg(m):
-    return 1.66053904e-27 * m
-
-
-def mask_data(mask: Callable[[List], List], keyarr: List, *data: List[List], modify_keyarr: bool = True,
-              output_type_modifier=None):
-    m: List = mask(keyarr)
-    if modify_keyarr:
-        result = (x for i, x in enumerate(keyarr) if m[i])
-        if output_type_modifier is None:
-            yield type(keyarr)(result)
-        else:
-            yield output_type_modifier(result)
-    for arr in data:
-        result = (x for i, x in enumerate(arr) if m[i])
-        if output_type_modifier is None:
-            yield type(arr)(result)
-        else:
-            yield output_type_modifier(result)
-
-
 def get_data(filename: str):
     with open(filename, "r") as f:
         for i, line in enumerate(f):
@@ -69,7 +44,7 @@ def get_data(filename: str):
             yield tuple(float(x) for x in line.split("\t"))
 
 
-def calibration(plot=True):
+def calibration(plot=True, log=True):
     """ Frequency Calibration """
     calib_lims = [(-0.8, -0.41), (-0.41, -0.11), (0.13, 0.49), (0.63, 0.95)]
     inner_lims = [(-0.57, -0.505), (-0.31, -0.265), (0.30, 0.33), (0.77, 0.83)]
@@ -105,7 +80,8 @@ def calibration(plot=True):
         P0 = [ufloat(popt[j], np.sqrt(pcov[j][j])) for j in range(len(popt))]
         voltages.append(P0[1])
 
-        print("P0 {}: {}".format(i, P0))
+        if log:
+            print("P0 {}: {}".format(i, P0))
 
     Rb87F1F2 = 6.834682610904290e9  # Hz
     Rb85F2F3 = 3.0357324390e9  # Hz
@@ -116,14 +92,16 @@ def calibration(plot=True):
 
     delta_V = abs(voltages[2] - voltages[1])
 
-    print("Test with literature value for Lorenz:", voltage_to_freq(delta_V) * 1e-9, "GHz")
-    print("Deviation:", 100 * (voltage_to_freq(delta_V) - Rb85F2F3) / Rb85F2F3, "%")
+    if log:
+        print("Test with literature value for Lorenz:", voltage_to_freq(delta_V) * 1e-9, "GHz")
+        print("Deviation:", 100 * (voltage_to_freq(delta_V) - Rb85F2F3) / Rb85F2F3, "%")
 
     dVdf2 = delta_V / Rb85F2F3
 
-    print("dVdf =", dVdf1)
-    # checking result
-    print("dVdf2 =", dVdf2)
+    if log:
+        print("dVdf =", dVdf1)
+        # checking result
+        print("dVdf2 =", dVdf2)
 
     if plot:
         plt.xlabel("Aux Out [V]")
@@ -132,7 +110,7 @@ def calibration(plot=True):
         plt.show()
 
 
-def get_lorentz_data(plot=True, return_temperatures=False):
+def get_lorentz_data(plot=True, return_temperatures=False, log=True):
     filenames = ["85F2", "85F3", "87F1", "87F2"]
 
     xlims = [(0.25, 0.28), (-0.29, -0.245), (0.65, 0.71), (0.15, 0.22)]
@@ -165,7 +143,8 @@ def get_lorentz_data(plot=True, return_temperatures=False):
 
         T = sigma ** 2 * m * consts.c ** 2 / (nu_0 ** 2 * consts.k)
 
-        print("T =", T, "K")
+        if log:
+            print("T =", T, "K")
         temperatures.append(T)
 
         lorentzdata = np.array(list(data_in)) - gaussian(np.array(list(data_out)), *popt)
@@ -205,7 +184,7 @@ def get_hyperfine_data(plot=True):
             ax2 = ax1.twinx()
 
             color = "tab:green"
-            ax2.set_ylabel("PDH [V]", color=color)
+            ax2.set_ylabel("PDH [a.u.]", color=color)
             ax2.plot(data_out, pdh, color=color)
             ax2.tick_params(axis="y", labelcolor=color)
 
@@ -218,26 +197,17 @@ def lorentzfit(lorentz_data, plot=True, return_gammas=False):
     for i in range(len(lorentz_data)):
         lorentz_data[i] = tuple(np.array(x) for x in lorentz_data[i])
 
-    """ HIER WERTE ÄNDERN """
-
-    # die hier sind aus dem PDF
+    # these values are from the pdf
     mask_ranges = [[(0.252, 0.2575), None, (0.2700, 0.2747)],
                    [(-0.2856, -0.28158), (-0.2785, -0.2745), (-0.2535, -0.2471)],
                    [(0.66, 0.675), (0.6772, 0.6863), (0.7000, 0.7142)],
                    [None, (0.1551, 0.1665), (0.2022, 0.2119)]]
 
-    # works
-    # starting_values = [[[0.2555, 0.003, 0.03, 0.015], None, [0.272, 0.003, 0.004, 0.021]],
-    #                    [[-0.283, 0.003, 0.009, 0.019], [-0.276, 0.003, 0.005, 0.0275], [-0.250, 0.003, 0.008, 0.02]],
-    #                    [[0.666, 0.005, 0.0065, 0.0028], None, [0.706, 0.003, 0.008, 0.008]],
-    #                    [None, [0.160, 0.003, 0.0065, 0.0035], [0.206, 0.003, 0.02, 0.005]]]
-
     starting_values = [[[0.2555, 0.003, 0.03, 0.015, 0], None, [0.272, 0.003, 0.004, 0.021, 0]],
-                       [[-0.283, 0.003, 0.009, 0.019, 0], [-0.276, 0.003, 0.005, 0.0275, 0], [-0.250, 0.003, 0.008, 0.02, 0]],
+                       [[-0.283, 0.003, 0.009, 0.019, 0], [-0.276, 0.003, 0.005, 0.0275, 0],
+                        [-0.250, 0.003, 0.008, 0.02, 0]],
                        [[0.666, 0.005, 0.0065, 0.0028, 1], None, [0.706, 0.003, 0.008, 0.008, 1]],
                        [None, [0.160, 0.003, 0.0065, 0.0035, -0.5], [0.206, 0.003, 0.02, 0.005, 0]]]
-
-    """ AB HIER NICHT MEHR WERTE ÄNDERN """
 
     gammas = []
 
@@ -256,7 +226,6 @@ def lorentzfit(lorentz_data, plot=True, return_gammas=False):
 
             gamma = ufloat(popt[1], np.sqrt(pcov[1][1]))
 
-            print(voltage_to_freq(gamma) * 1e-6)
             gammas.append(voltage_to_freq(gamma) * 1e-6)
 
             if plot:
@@ -272,30 +241,95 @@ def lorentzfit(lorentz_data, plot=True, return_gammas=False):
         return gammas
 
 
-def hyperfine(plot=True):
-    data = list(get_hyperfine_data(plot=True))
+def hyperfine(plot=True, log=True):
+    # some estimates will be shifted right or left in order not to find the wrong peak
+    x0_arr = [[0.209736, 0.2124, 0.216923, 0.219873, 0.226917],
+              [0.319, 0.327099, 0.332584, 0.339475, 0.352864],
+              [0.654384, 0.6627, 0.672215, 0.679843, 0.6976],
+              [0.07777, 0.0952475, 0.107574, 0.125365, 0.154338]]
 
-    # for i in range(len(data)):
-    #     data[i] = tuple(np.array(x) for x in data[i])
-    #
-    # for data_in, data_out in data:
-    #     plt.plot(data_in, data_out, label="Data")
-    #     plt.xlabel("Aux Out [V]")
-    #     plt.ylabel("Aux In [V]")
-    #     plt.legend()
-    #     plt.show()
+    for x0, (data_out, data_in, pdh) in zip(x0_arr, get_hyperfine_data(plot=False)):
+        mean_N = 20
+        smooth_pdh = np.array(rolling_mean(pdh, mean_N))
+
+        # find solutions for phd
+        peaks = dsolve(np.array(mask_rolling_mean(data_out, mean_N)), smooth_pdh, x0=x0)
+
+        # the uncertainty in the peaks can be estimated by the mean difference in data_out (i.e. mean x-step) and mean_N
+        delta_peaks = np.mean(np.diff(data_out)) * mean_N
+
+        peaks = unp.uarray(peaks, delta_peaks)
+        if log:
+            # print("peaks:", peaks)
+            print("Separation in MHz:")
+            for x in voltage_to_freq(np.diff(peaks)) * 1e-6:
+                print("{}".format(x))
+            # print("{}".format(voltage_to_freq(np.diff(peaks)) * 1e-6))
+
+        if plot:
+            fig, ax1 = plt.subplots(figsize=(10, 8))
+            color = "tab:blue"
+            ax1.set_xlabel("Aux Out [V]")
+            ax1.set_ylabel("Aux In [V]", color=color)
+            ax1.plot(data_out, data_in, color=color)
+            # ax1.plot(mask_rolling_mean(data_out, mean_N), rolling_mean(data_in, mean_N), color="orange")
+            # ax1.plot(mask_rolling_mean(data_out, mean_N), smooth_data_in, color=color)
+            ax1.tick_params(axis="y", labelcolor=color)
+
+            ax2 = ax1.twinx()
+            ax2.axhline(color="black", linestyle="--", alpha=0.4)
+
+            for x0 in peaks:
+                plt.axvline(x=x0.nominal_value, color="red", alpha=0.6)
+                plt.axvline(x=x0.nominal_value - x0.std_dev, color="orange", alpha=0.6)
+                plt.axvline(x=x0.nominal_value + x0.std_dev, color="orange", alpha=0.6)
+
+            color = "tab:green"
+            ax2.set_ylabel("PDH [a.u.]", color=color)
+            # ax2.plot(data_out, pdh, color="orange")  # original pdh
+            ax2.plot(mask_rolling_mean(data_out, mean_N), smooth_pdh, color=color)
+
+            ax2.tick_params(axis="y", labelcolor=color)
+
+            plt.show()
+
+    values = [74, 137, 92, 131, 223, 305]
+    lvalues = [63.40161, 120.64068, 72.218040, 156.947070, 229.16511, 266.650090]
+    deltas = [5, 7, 10, 10, 10, 13]
+
+    for v, l, d in zip(values, lvalues, deltas):
+        sig = abs(v - l) / d
+        print(sig)
+
+
+"""
+
+Separations:
+
+    Note: I declared the very left peak in 87F1 to be the F'=0 peak, though this is controversial,
+    since the peak to the right of the F'=1 peak is not visible in the spectrum then, although it
+    should be much bigger than the F'=0 peak.
+    
+    84F2 -> F':
+    
+    Isotope     F       F'1     F'2     experimental value (MHz)    literature value (MHz)      sigma
+    85          2       2       3       74 +/- 5                    63.401(61)                  2.1
+    85          3       3       4       137 +/- 7                   120.640(68)                 2.3
+    87          1       0       1       92 +/- 10                   72.2180(40)                 2.0
+    87          1       1       2       131 +/- 10                  156.9470(70)                2.6
+    87          1       0       2       223 +/- 10                  229.165(11)                 0.62
+    87          2       2       3       305 +/- 13                  266.6500(90)                2.9
+    
+"""
 
 
 def main(argv: list) -> int:
-    # calibration()
-    lorentz_data = list(get_lorentz_data(plot=False))
+    calibration(plot=False, log=False)
+    lorentz_data = list(get_lorentz_data(plot=False, log=False))
     lorentzfit(lorentz_data, plot=False)
-    hyperfine()
+    hyperfine(plot=True, log=True)
     return 0
 
 
 if __name__ == "__main__":
     main(sys.argv)
-
-
-
