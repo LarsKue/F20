@@ -140,12 +140,14 @@ def main(argv: list) -> int:
             # print(len(mxdata), len(mydata))
             mxdata, mydata = tuple(mask_data(mask, mxdata, mydata))
             popt, pcov = curve_fit(loading_dgl, mxdata, unp.nominal_values(mydata), maxfev=5000)
-            # plt.plot(mxdata, loading_dgl(mxdata, *popt))
-            # plt.plot(mxdata, unp.nominal_values(mydata), marker='.', linewidth=0)
+            # plt.plot(mxdata, loading_dgl(mxdata, *popt), label=r"Loading-Fit-Function $\frac{L}{\alpha}(1-e^{-\alpha x})$")
+            # plt.plot(mxdata, unp.nominal_values(mydata), marker='.', linewidth=0, label="measured atom number")
             # # plt.plot(xdata, unp.nominal_values(ydata), marker=".", linewidth=0)
             # plt.xlabel("Time [s]")
             # plt.ylabel("Number of Atoms")
+            # plt.title(r"Coil Current: 10.0A and $f_{AOM}=110.75$ Hz")
             # print("L=", popt[0]," alpha=", popt[1], "N_max=", popt[0]/popt[1])
+            # plt.legend()
             # plt.show()
             # print(popt[2])
             L.append(popt[0])
@@ -183,9 +185,7 @@ def main(argv: list) -> int:
     def detuning_calculator(x):
         return (2 * x) - 60 - (2 * 85)  # Mhz
 
-    for i in range(1, 4):
-        plt.plot(detuning_calculator(np.array([109.75, 110.25, 110.75, 111.25, 111.75, 112.25])), A[6*(i-1): (6*i)])
-        plt.show()
+
     titles = np.array([r"$\alpha \ [\frac{1}{s}]$ vs. Detuning Frequency [MHz]",
                        r"Loss rate L $[\frac{1}{s}]$ vs. Detuning Frequency [MHz]"
                           , r"$N_{max} \ [-]$ vs. Detuning Frequency [MHz]"])
