@@ -272,6 +272,7 @@ def hyperfine(plot=True, log=True):
             ax1.set_xlabel("Aux Out [V]")
             ax1.set_ylabel("Aux In [V]", color=color)
             ax1.plot(data_out, data_in, color=color)
+            # ax1.plot(mask_rolling_mean(data_out, mean_N), rolling_mean(data_in, mean_N), color="orange")
             # ax1.plot(mask_rolling_mean(data_out, mean_N), smooth_data_in, color=color)
             ax1.tick_params(axis="y", labelcolor=color)
 
@@ -285,6 +286,7 @@ def hyperfine(plot=True, log=True):
 
             color = "tab:green"
             ax2.set_ylabel("PDH [a.u.]", color=color)
+            # ax2.plot(data_out, pdh, color="orange")  # original pdh
             ax2.plot(mask_rolling_mean(data_out, mean_N), smooth_pdh, color=color)
 
             ax2.tick_params(axis="y", labelcolor=color)
@@ -310,12 +312,12 @@ Separations:
     
     84F2 -> F':
     
-    Isotope     F       F'1     F'2     experimental value (MHz)    literature value (MHz)      sigma       Notes
+    Isotope     F       F'1     F'2     experimental value (MHz)    literature value (MHz)      sigma
     85          2       2       3       74 +/- 5                    63.401(61)                  2.1
     85          3       3       4       137 +/- 7                   120.640(68)                 2.3
-    87          1       0       1       92 +/- 10                   72.2180(40)                 2.0         uncertain if this is the right peak
-    87          1       1       2       131 +/- 10                  156.9470(70)                2.6         uncertain if this is the right peak
-    87          1       0       2       223 +/- 10                  229.165(11)                 0.62        uncertain if this is the right peak
+    87          1       0       1       92 +/- 10                   72.2180(40)                 2.0
+    87          1       1       2       131 +/- 10                  156.9470(70)                2.6
+    87          1       0       2       223 +/- 10                  229.165(11)                 0.62
     87          2       2       3       305 +/- 13                  266.6500(90)                2.9
     
 """
