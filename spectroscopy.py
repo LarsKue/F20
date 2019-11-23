@@ -130,6 +130,7 @@ def get_lorentz_data(plot=True, return_temperatures=False, log=True):
         data_out, data_in, pdh = zip(*list(get_data(data_folder + filename + ".txt")))
 
         if plot:
+            plt.figure(figsize=(8, 6))
             plt.plot(data_out, data_in, label="Data")
 
         @np.vectorize
@@ -154,10 +155,11 @@ def get_lorentz_data(plot=True, return_temperatures=False, log=True):
         if plot:
             x = np.linspace(data_out[0], data_out[-1], 10000)
             plt.plot(x, gaussian(x, *popt), color="orange", label="Gaussian Fit")
+            plt.plot([], [], " ", label=f"T = {T}K")
             plt.xlabel("Aux Out [V]")
             plt.ylabel("Aux In [V]")
             plt.title(filename)
-            plt.legend()
+            plt.legend(loc="lower left")
             plt.show()
 
     if return_temperatures:

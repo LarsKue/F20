@@ -5,7 +5,14 @@
 \usepackage{physics} % (partial) derivatives, etc.
 \usepackage{siunitx}
 \usepackage{hyperref}
-\usepackage{ amssymb }
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    filecolor=black,
+    urlcolor=blue,
+    citecolor=black,
+}
+\usepackage{amssymb}
 \usepackage{subfigure}
 
 
@@ -66,7 +73,7 @@ The Magneto-Opitcal Trap makes use of an abundance of physical topics mainly foc
         \centering
         \includegraphics[width=0.4\textwidth]{800px-Doppler_spectroscopy.png}
     }
-    
+
     \caption{Schematic sketch of the spectroscopy path with:  PBS being a polarizing beam splitter, GT means Galilean Telescope and H references a half waveplate, \cite{script}}
     \label{doppler_spect}
 \end{figure}
@@ -78,7 +85,7 @@ As shown in Fig.\ref{doppler_spect}, the laser beam passes a Rb vapour cell befo
 where $\kappa = h\nu n_0 \alpha (P_0 - P_1)$ denotes the absorption coefficient, $x$ the path and $I$ the beam intensity. Furthermore:
 \begin{equation}
 \alpha = \alpha_0 \mathcal{L}(\nu , \nu_0)
-\end{equation} 
+\end{equation}
 describes the frequency dependence of $\kappa$, which has a Lorentzian shape. The expression $P_0 - P_1$ gives us the relation between atoms in the excited ($P_1$) versus the ground state ($P_0$). The fraction $\frac{P_1}{P_0}$ has a Gaussian shape and depends on frequency and temperature.
 A complication for evaluating the exact position of absorption dips are the Doppler shifts created through the movement of the atoms in the vapour cell. The so-called "Doppler broadening" which we then can observe in our Intensity-Frequency-diagram has a Gaussian shape with the standard deviation being:
 \begin{equation}
@@ -92,12 +99,12 @@ where $T$ denotes the temperature, $k_B$ the Boltzmann constant and $m$ the mass
         \centering
         \includegraphics[width=0.4\textwidth]{Rb_satabs.png}
     }
-    
+
     \caption{measured spectra with cross-over resonances, \cite{script}}
     \label{measured_spec}
 \end{figure}
 
-Since the Rubidium atoms have a more complicated V-shaped energy level schematic (two upper energy levels and one lower), the process creates crossover-peaks which can be observed in the Gaussian absorption dip. 
+Since the Rubidium atoms have a more complicated V-shaped energy level schematic (two upper energy levels and one lower), the process creates crossover-peaks which can be observed in the Gaussian absorption dip.
 Rubidium has fine structure levels with L-S coupling
 \begin{equation}
 \vec{J} = \vec{L} + \vec{S}
@@ -117,10 +124,10 @@ Also, we make use of frequency modulation spectroscopy in order to measure the L
 \subsubsection{Magneto-Optical Trap}
 The Magneto-Optical trap used to cool atoms to a few $100\ \mu  K$ uses two main principles: the effect of optical molasses and the Zeeman-effect, which occurs under the influence of an external magetic field gradient. The linear momentum imposed upon atoms by light can be written as $p=\hbar k$. Furthermore $\hbar \omega$ changes the internal energy of an atom and the angular momentum has effect on the orbital angular momentum $l$ with the selection rule $\Delta l=\pm 1$. Through these elementary processes, the atoms are slowed down in the optical molasses (OM): two opposing standing-wave laser beams dampen the atomic motion where the force $\vec{F}_{OM}$ is proportional to the velocity of the atoms $-\vec{v}$. This process only works in cooperation with the doppler-free spectroscopy, since the resonance frequencies must be "scanned" and acquired.
 
-However, there are limits to cooling via OM: the recoil limit (for $^{85}Rb$, $T_r = 0.370\mu K$) and doppler temperature limit (for $^{85}Rb$, $T_D = 143.41\mu K$), which limit the cooling to a few hundreds of $\mu K$. 
+However, there are limits to cooling via OM: the recoil limit (for $^{85}Rb$, $T_r = 0.370\mu K$) and doppler temperature limit (for $^{85}Rb$, $T_D = 143.41\mu K$), which limit the cooling to a few hundreds of $\mu K$.
 
 The MOT is comosed of a quadrupole magnetic field and three pairs of counter propagating laser beams.
-The actual trapping is achieved through a anti-Helmholtz-coil, which makes use of the $M_e$-Zeeman-component-splitting to $M_e = +1$ and $M_e = -1$ depending on the polarisation of the light and to which direction the atoms are escaping. 
+The actual trapping is achieved through a anti-Helmholtz-coil, which makes use of the $M_e$-Zeeman-component-splitting to $M_e = +1$ and $M_e = -1$ depending on the polarisation of the light and to which direction the atoms are escaping.
 
 The missing link between measuring the temperature of our MOT and the physics mentioned above is the so called "release-recapture method" which has as its base the rate equation:
 \begin{equation}
@@ -129,13 +136,13 @@ The missing link between measuring the temperature of our MOT and the physics me
 where $N$ denotes the number of trapped particles, $L$ the loss-rate and $\alpha$ the one-body loss coefficient. The solution is given by:
 \begin{equation}
 N(t) = \frac{L}{\alpha}(1-e^{-\alpha x})
-\end{equation} 
+\end{equation}
 Here, the laser is switched on and off to analize the number of recaptured atoms after a varying time interval, in which the laser is turned off.
 Through the Stefan-Boltzmann velocity distribution, one arrives at the follwing fraction in order to compute the temperature $T$:
 \begin{equation}
 \frac{N(t)}{N(0)} = erf(\chi) - \frac{2}{\sqrt{\pi}} \chi e^{-\chi ^2}
 \end{equation}
-where $\chi = \sqrt{\frac{M}{k_{b} T}}\frac{R}{t}$, $t =$\textit{time stamp at which MOT is turned back on} and $N(0)$ is the initial atom number (where the trap is fully loaded). \cite{script} 
+where $\chi = \sqrt{\frac{M}{k_{b} T}}\frac{R}{t}$, $t$ is the time stamp at which MOT is turned back on and $N(0)$ is the initial atom number (where the trap is fully loaded). \cite{script}
 
 
 \subsection{Goal of the Experiment}
@@ -160,22 +167,23 @@ The goal of the experiment is to analise doppler-free spectra and match atomic t
 
 
 
-
+%%% LARS ANFANG %%%
+\newpage
 
 \section{Data Analysis}
 \subsection{Spectroscopy}
 \subsubsection{Multiplet Separation}
 
-%%% LARS ANFANG %%%
-During the experiment, all data was recorded in Volts rather than frequency, energy, et cetera. Therefore, to analyse the spectral data of the Rubidium 85 and 87 D2 lines, we first need to calibrate the horizontal axis. In all atoms, energy levels are only observable through absorption or emission of a photon by an electron jumping from one level to another. Due to this, it is not possible to know the absolute energy a level possesses. Only the difference between two levels is observable. As such, we can only infer a cardinal interval scale to the horizontal axis, meaning the zero point is arbitrary.
+During the experiment, all data was recorded as a voltage rather than frequency, energy, et cetera. Therefore, to analyse the spectral data of the Rubidium 85 and 87 D2 lines, we first need to calibrate the horizontal axis. In all atoms, energy levels are only observable through absorption or emission of a photon by an electron jumping from one level to another. Due to this, it is not possible to know the absolute energy a level possesses. Only the difference between two levels is observable. As such, we can only infer a cardinal interval scale to the horizontal axis, meaning the zero point is arbitrary.
 
-First, we plotted the full spectrum in which all fine energy level dips are visible. The plot looked as we anticipated, showing 4 separated large (gaussian) dips, accommodated with several smaller peaks near their middle. In order to find the mean value each dip is at, we fitted a gaussian added with a linear background function to each of the profiles:
+First, we plotted the full spectrum in which all fine energy level dips are visible. The plot looked as we anticipated, showing 4 separated large (Gaussian) dips, each accommodated with several smaller (Lorentzian) peaks near their middle. In order to find the mean value each dip is at, we fitted a Gaussian added with a linear background function to each of the profiles:
 
 \begin{equation}
 A_0 \exp{\frac{-(x - \mu)^2}{2 \sigma^2}} + ax + b
+\label{gaussianfit}
 \end{equation}
 
-Where $A_0$, $\mu$, $\sigma$, $a$, and $b$ were fit parameters, with $A_0$ representing the amplitude, $\mu$ the dip's mean value, $\sigma$ the standard deviation and $a$ and $b$ being background parameters.
+Where $A_0$, $\mu$, $\sigma$, $a$, and $b$ were fit parameters, with $A_0$ representing the (negative) amplitude, $\mu$ the dip's mean value, $\sigma$ the standard deviation and $a$ and $b$ being background parameters. In order to achieve a better fit, the areas with the Lorentzian peaks were masked out beforehand.
 
 \begin{figure}
     \centering
@@ -191,17 +199,55 @@ Where $A_0$, $\mu$, $\sigma$, $a$, and $b$ were fit parameters, with $A_0$ repre
     \caption{Left: Full Spectrum. Right: Gaussian Fits}
 \end{figure}
 
-Using the separations in $(\mu \pm \sigma)$ from one another, we can derive the calibration from the literature value of these separations. With the literature value\footnote{$= 6.8346826109042(90)\;\si{\giga\hertz}$} for the larger separation between Rubidium 87 $F = 1$ and $F = 2$, we can calculate
+Using the separations in $(\mu \pm \sigma)$ from one another, we can derive the calibration from the literature value of these separations. With the literature value\footnote{$= 6.8346826109042(90)\;\si{\giga\hertz}$\cite{script}} for the larger separation between Rubidium 87 $F = 1$ and $F = 2$, we can calculate
 
 \begin{equation}
-\dv{V}{f} = (1.9366 \pm 0.0008) \cdot 10^{-10} \quad \si{\frac{\volt}{\hertz}}
+\alpha^{-1} \equiv \dv{V}{f} = (1.9366 \pm 0.0008) \cdot 10^{-10} \quad \si{\frac{\volt}{\hertz}}
 \end{equation}
 
-We then use the reciprocal of this value to convert any difference in volts $\Delta V$ to a difference in Hertz $\Delta f$:
+We then assume a linear proportionality $f \propto \alpha V$ and use $\alpha$ to convert any difference in volts $\Delta V$ to a difference in Hertz $\Delta f$:
 
 \begin{equation}
-\Delta f (\Delta V) = \frac{\Delta V}{\dv{V}{f}}
+\Delta f (\Delta V) = \alpha \Delta V
+\label{conversion}
 \end{equation}
+
+Comparing the literature value of the separation in the Rubidium 85 $F = 2$ and $F = 3$ dips\footnote{$=3.0357324390(60) \;\si{\giga\hertz}$\cite{script}} with the one calculated from \autoref{conversion}, we can estimate an uncertainty in $\alpha$, which we found to be $(0.71 \pm 0.06) \%$. This is sufficiently accurate for the purposes of this experiment.
+
+\subsubsection{Natural Transition Line Width and Doppler Broadening}
+
+We then analysed the spectra we recorded for each individual Gaussian dip. Once again using \autoref{gaussianfit} as the fit function while masking out the Lorentzian peaks, we received a Gaussian profile which we could then subtract from the data in order to further analyse the Lorentzian peaks.
+
+\begin{figure}
+    \centering
+    \parbox{0.45\textwidth}{
+        \includegraphics[width=0.5\textwidth]{gaussian1.png}
+    }
+    \hfill
+    \parbox{0.45\textwidth}{
+        \includegraphics[width=0.5\textwidth]{gaussian2.png}
+    }
+    \parbox{0.45\textwidth}{
+        \includegraphics[width=0.5\textwidth]{gaussian3.png}
+    }
+    \hfill
+    \parbox{0.45\textwidth}{
+        \includegraphics[width=0.5\textwidth]{gaussian4.png}
+    }
+    \caption{Gaussian Profiles}
+    \label{gaussianprofiles}
+\end{figure}
+
+From the Standard Deviation of these Gaussian Profiles we can also calculate the temperature of the atomic sample:
+
+\begin{equation}
+T = \sigma^2 \frac{mc^2}{\nu_0^2 k_B}
+\end{equation}
+
+Where $m$ is the atomic mass of a single Rubidium atom, $c$ is the speed of light, $\nu_0 = \frac{c}{\lambda}$ is the laser frequency and $k_B$ is the Boltzmann constant. Since we are not yet cooling the sample, we would expect values around $300\si{\kelvin}$. The individual results are shown in \autoref{gaussianprofiles}.
+
+
+
 
 
 
@@ -210,6 +256,12 @@ We then use the reciprocal of this value to convert any difference in volts $\De
 
 
 \newpage
+
+%%% LARS ENDE %%%
+
+
+
+
 
 
 
@@ -262,9 +314,69 @@ Trennungen am Zeilen$\backslash$-ende im LATEX so (siehe z.B.\ das vorige
 `Haupt\-w"or\-ter') im LATEX, falls es zu seltsamen
 Trennungen oder Nichttrennungen (oft bei deutschen Umlauten) kommt.
 
-\section{Diskussion}
 
-Hier werden alle wesentlichen Ergebnisse nochmals angefuehrt und diskutiert. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%%% LARS ANFANG %%%
+
+\newpage
+
+\section{Discussion and Critical Analysis}
+
+% regarding the temperature deviations from the gaussian profiles
+It is noteworthy that while these are within the correct order of magnitude, their deviation from the expected $300\si{\kelvin}$ is quite large, suggesting that there is an underlying systematical uncertainty. Considering that the wider the range of the Lorentzian dips we had to mask is, the further the results stray from the expected value, we can assume that one of the most influential sources of this uncertainty is an inaccuracy in the fit. This is further confirmed by the fact that any uncertainty in $T$ stems purely from an uncertainty in $\sigma$ (with quadratic dependence), which is a fit parameter.
+
+
+
+\newpage
+%%% LARS ENDE
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Hier werden alle wesentlichen Ergebnisse nochmals angefuehrt und diskutiert.
 Bild~\ref{ps} 
 % \ref{ps} korrespondiert mit \label{ps}. Das kann man fuer
 % Bilder, Tabellen oder Abschnitte [\section, \subsection ...] benutzen und
@@ -288,7 +400,7 @@ Am Schluss kann man noch eine allgemeinere Bemerkung zum Versuch machen.
 %% Literatur)
 
 \begin{thebibliography}{00}   % {00}: max 2-stellige Referenznummer
-\bibitem{script} C. Hofmann, M. Repp, V. Gavryusev , S. H\"afner, F20-Wiki, Fortgeschrittenenpraktikum Heidelberg, Faculty for Physics, Heidelberg University [Link: \url{https://www.physi.uni-heidelberg.de/Forschung/QD/f20wikinew/index.php/Main_Page}
+\bibitem{script} C. Hofmann, M. Repp, V. Gavryusev , S. H\"afner, \href{https://www.physi.uni-heidelberg.de/Forschung/QD/f20wikinew/index.php/Main_Page}{F20-Wiki}, Fortgeschrittenenpraktikum Heidelberg, Faculty for Physics, Heidelberg University
 \bibitem{afo} F. Afo, Nature 15 (1905) 23
 \bibitem{uwe} Uwe Ludwig, private Mitteilung
 \bibitem{karl} Karl Popper, Phys.~Rev.~Lett.~95 (2001) 25
