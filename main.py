@@ -10,7 +10,7 @@ import numpy as np
 
 def main(argv: list) -> int:
     spectroscopy.main(argv)
-    # loading_curves.main(argv)
+    loading_curves.main(argv)
     return 0
 
 

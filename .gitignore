@@ -108,3 +108,8 @@ venv.bak/
 
 # pdf files
 *.pdf
+
+# don't upload any latex files except the images and .tex file
+LaTeX/*
+!LaTeX/images/*.png
+!LaTeX/F20.tex
