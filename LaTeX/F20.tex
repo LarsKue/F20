@@ -142,7 +142,7 @@ Through the Stefan-Boltzmann velocity distribution, one arrives at the follwing 
 \begin{equation}
 \frac{N(t)}{N(0)} = erf(\chi) - \frac{2}{\sqrt{\pi}} \chi e^{-\chi ^2}
 \end{equation}
-where $\chi = \sqrt{\frac{M}{k_{b} T}}\frac{R}{t}$, $t$ is the time stamp at which the MOT is turned back on and $N(0)$ is the initial atom number (where the trap is fully loaded). \cite{script}
+where $\chi = \sqrt{\frac{M}{k_{b} T}}\frac{R}{t}$, $t$ is the time stamp at which MOT is turned back on, $N(0)$ is the initial atom number (where the trap is fully loaded), $M$ is the particle mass and $R=1.5$mm the radius of the atom cloud. \cite{script}
 
 
 \subsection{Goal of the Experiment}
@@ -153,13 +153,27 @@ The goal of the experiment is to analise doppler-free spectra and match atomic t
 
 \begin{figure}[h]
 \centering
-    \subfigure[MOT setup]{\includegraphics[width=0.4\textwidth]{779px-Vacuum_chamber_2.png}}
-    \subfigure[optical setup]{\includegraphics[width=0.4\textwidth]{800px-Setup-schematic.png}}
+    \subfigure[MOT setup]{\includegraphics[width=0.35\textwidth]{779px-Vacuum_chamber_2.png}}
+    \subfigure[optical setup]{\includegraphics[width=0.5\textwidth]{800px-Setup-schematic.png}}
 \caption{Schematics of the experimental setup, \cite{script}}
 	\label{expsetup}
 \end{figure}
 
+\subsection{Diode lasers and laser locking}
+This experiment is equipped with two home-built external cavity diode lasers for addressing the cooling transition and the repumping transition. The frequency of both lasers can be altered with an in-built acousto-optic modulator (AOM). The piezo crystal, which generates the AOM, can be influenced by changing the offset voltage on the controller (Thorlabs MDT693A).
 
+In order to stabilise the laser signal (no fluctuations in intensity and frequency), we make use of a digital PID controller (Toptica Digilock 110). This device was also used to change the detuning of the two laser beams by adjusting a screw on the front panel of the device.
+
+These devices allow for a laser accuracy of 1MHz, which is less than the natural linewidth of the atomic transition.
+
+\subsection{Optical setup}
+The optical setup is presented in Fig. 3 (b) and roughly consist of a spectroscopy path, a MOT path and an imaging path. We make use of anamorphic prism pairs, optical isolators, wave plates, beam splitters, a laser beam expansion, AOMs, photo diodes and a double pass configuration (for the AOM).
+
+\subsection{Vacuum system}
+The vacuum system is shown in Fig. 3 (a). It consist the vacuum sealed housing itself, of an ion pump, an anti-Helmholtz coil and windows for the six laser beams. With the ion pump, we create an ultra-high vacuum (UHV) environment of about $10^-{9}$mbar, without which the experiment would fail due to collisions with air molecules. The anti-Helmholtz coils have a diameter of about 170mm and a distance of 115mm. They can sustain currents of up to 11A.
+
+\section{Measured Data}
+The measuring process was done digitally with a digital oscilloscope and the provided software on the computer.
 
 
 
