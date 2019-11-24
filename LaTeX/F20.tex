@@ -137,7 +137,7 @@ where $N$ denotes the number of trapped particles, $L$ the loss-rate and $\alpha
 \begin{equation}
 N(t) = \frac{L}{\alpha}(1-e^{-\alpha x})
 \end{equation}
-Here, the laser is switched on and off to analize the number of recaptured atoms after a varying time interval, in which the laser is turned off.
+Later, the laser is switched on and off to analise the number of recaptured atoms $N(t)$ after a varying time interval, in which the laser is turned off.
 Through the Stefan-Boltzmann velocity distribution, one arrives at the follwing fraction in order to compute the temperature $T$:
 \begin{equation}
 \frac{N(t)}{N(0)} = erf(\chi) - \frac{2}{\sqrt{\pi}} \chi e^{-\chi ^2}
@@ -154,7 +154,7 @@ The goal of the experiment is to analise doppler-free spectra and match atomic t
 \begin{figure}[h]
 \centering
     \subfigure[MOT setup]{\includegraphics[width=0.35\textwidth]{779px-Vacuum_chamber_2.png}}
-    \subfigure[optical setup]{\includegraphics[width=0.5\textwidth]{800px-Setup-schematic.png}}
+    \subfigure[optical setup]{\includegraphics[width=0.35\textwidth]{800px-Setup-schematic.png}}
 \caption{Schematics of the experimental setup, \cite{script}}
 	\label{expsetup}
 \end{figure}
@@ -170,10 +170,23 @@ These devices allow for a laser accuracy of 1MHz, which is less than the natural
 The optical setup is presented in Fig. 3 (b) and roughly consist of a spectroscopy path, a MOT path and an imaging path. We make use of anamorphic prism pairs, optical isolators, wave plates, beam splitters, a laser beam expansion, AOMs, photo diodes and a double pass configuration (for the AOM).
 
 \subsection{Vacuum system}
-The vacuum system is shown in Fig. 3 (a). It consist the vacuum sealed housing itself, of an ion pump, an anti-Helmholtz coil and windows for the six laser beams. With the ion pump, we create an ultra-high vacuum (UHV) environment of about $10^-{9}$mbar, without which the experiment would fail due to collisions with air molecules. The anti-Helmholtz coils have a diameter of about 170mm and a distance of 115mm. They can sustain currents of up to 11A.
+The vacuum system is shown in Fig. 3 (a). It consist the vacuum sealed housing itself, of an ion pump, an anti-Helmholtz coil and windows for the six laser beams. With the ion pump, we create an ultra-high vacuum (UHV) environment of about $10^{-9}$ mbar, without which the experiment would fail due to collisions with air molecules. The anti-Helmholtz coils have a diameter of about 170 mm and a distance of 115 mm. They can sustain currents of up to 11A.
 
 \section{Measured Data}
-The measuring process was done digitally with a digital oscilloscope and the provided software on the computer.
+\begin{figure}[h]
+\centering
+    \subfigure[example of a loading curve captured with an oscilloscope]{\includegraphics[width=0.3\textwidth]{F0020TEK.png}}
+    \subfigure[the full raw spectrum with the derivative visible]{\includegraphics[width=0.41\textwidth]{fullspectrum_meas.png}}
+\caption{Examples of measured data}
+	\label{examplemeas}
+\end{figure}
+The measuring process was done digitally with a digital oscilloscope and the provided software on the computer. An example for the raw data can be seen below in Fig. \ref{examplemeas}. Furthermore, we specifically measured the laser beam power for the power-atom-number-conversion, which can be found in \cite{script}. The measurement was done with a digital power meter.
+
+intensity y-beam: $7.5$ mW $\pm$ $0.5$ mW; intensity z-beam: $8.3$ mW $\pm$ $0.5$ mW
+
+intensity x-beam: $4.8$ mW $\pm$ $0.4$ mW; background: $13$ $\mu$W $\pm$ $3$ $\mu$W
+
+
 
 
 
@@ -182,7 +195,6 @@ The measuring process was done digitally with a digital oscilloscope and the pro
 
 
 %%% LARS ANFANG %%%
-\newpage
 
 \section{Data Analysis}
 \subsection{Spectroscopy}
@@ -199,7 +211,7 @@ A_0 \exp{\frac{-(x - \mu)^2}{2 \sigma^2}} + ax + b
 
 Where $A_0$, $\mu$, $\sigma$, $a$, and $b$ were fit parameters, with $A_0$ representing the (negative) amplitude, $\mu$ the dip's mean value, $\sigma$ the standard deviation and $a$ and $b$ being background parameters which account for dip overlap. In order to achieve a better fit, the areas with the Lorentzian peaks were masked out beforehand.
 
-\begin{figure}
+\begin{figure} [h]
     \centering
     \parbox{0.45\textwidth}{
         %\centering
@@ -353,60 +365,77 @@ Isotope     & $F =$  & $F'_1 =$   & $F'_2 =$   & Experimental Value [MHz]   & Li
 
 %%% LARS ENDE %%%
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-%% Bilder: Sie sollten nicht versuchen, postscript 'from scratch' selbst zu
-%% schreiben, sondern den Output von Analyseroutinen (PAW, ROOT, ...) oder
-%% von Plot-Programmen (xfig, tgif) verwenden
+\subsection{Loading Curves}
+\subsubsection{Generation of Loading Parameters, Optimisation of Loading Process}
+The measurements as seen in Fig. \ref{examplemeas} (a) consisted of measured power meter voltage on the y-axis and time on the x-axis. In order to make use of these measurements, the voltage had to be converted into atom number (this rather complicated mathematical procedure shall only be mentioned here, the exact derivation can be found here \cite{script}). The loading curve with a subtracted background was then fitted to equation (7). This fit then allowed us to generate the parameters $\alpha$, $L$ and $N_{max}$ for varying detunings of the laser and currents through the anti-Helmholtz-coil. We then plotted these results in order to have an overwiev of the optimal parameters which generate the highest atom number and resolution (Fig. \ref{results_loading}). For completion, the magnetic gradient is calculated via:
+\begin{equation}
+\frac{dB}{dz}(z=\frac{R}{2})=1.1\times 10^{-6}\frac{NI}{R^2}
+\end{equation}
+where $R=8.5$ cm, $N=90$ windings and $I$ denotes the current through the coil.
 
 \begin{figure}[h]
-  \centering
-  %\includegraphics[width=8cm,bbllx=112,bburx=447,bblly=264,bbury=582]{fig4.ps}
-  %\includegraphics[width=8cm]{fig4.eps}  
-  \caption{Beispiel f\"ur eingebundenes Postscript-File}
-  \label{ps}
+\centering
+    \subfigure[$\alpha$ vs. detuning frequency for different currents]
+{\includegraphics[width=0.4\textwidth]{alpha_gegen_det.png}}
+    \subfigure[$L$ vs. detuning frequency for different currents]{\includegraphics[width=0.5\textwidth]{loss_rate_gegen_det.png}}
+    \subfigure[$N_{max}$ vs. detuning frequency for different currents]{\includegraphics[width=0.4\textwidth]{particle_number_gegen_det.png}}
+    \subfigure[3D plot: detuning vs. magnetic field gradient vs. $N_{max}$]{\includegraphics[width=0.5\textwidth]{3dplot.png}}
+\caption{Results of 4.2.1}
+	\label{results_loading}
+\end{figure}
+\newpage
+
+As one can see: all parameters are highly dependent on the detuning of the laser and reach their maxima at about $-8.5$ MHz whereas a deviation from that value can lead to drops of  up to 60$\%$. During the experiment, we estimated a good set of parameters based on the intensity and size of the trapped atom cloud:
+
+\bigskip
+$f_{AOM}=(110.73 \pm 0.03)$ MHz (corresponds to a detuning of about $-8.5$ Mhz)
+
+$I_{Anti-Helmholtz}=(10.00 \pm 0.05)$ A
+
+$f_{AOM, spectroscopy}=2923.5$ MHz 
+
+\bigskip
+Comparing this to Fig.\ref{results_loading}, one can see that these parameters generate the desired atom number and loading rates.
+
+\subsubsection{Loading Curves and Calculation of MOT-Temperature}
+
+\begin{figure}[h]
+\centering
+    \subfigure[equation (8) fitted to $\frac{N(t)}{N(0)}$ for varying shut-down times]
+{\includegraphics[width=0.45\textwidth]{erf_fit.png}}
+    \subfigure[example of a loading curve used for the evaluation (9 ms down time)]{\includegraphics[width=0.45\textwidth]{9msdowntime.png}}
+\caption{graphics concerning the calculation of the MOT-temperature}
+	\label{erf_fit}
 \end{figure}
 
-Als erstes machen wir mal eine Gleichung im fortlaufenden Text (sog.\ math mode in LATEX): $s=\frac{1}{2}
-a t^2$, dann kommt eine separate gesetzte (sog.\ displaymath in LATEX):
-\[         s=\frac{1}{2}a t^2              \]  % die Leerzeichen tun nichts
-und dann geht's weiter im Text. Vielleicht eine Gleichung mit fortlaufender 
-Nummer:
-\begin{equation}
- s(t_1)=s(0) + \int_0^{t_1} v(t)\mbox{d}t 
-\end{equation}
-Symbole in Formeln werden in einem besonderen, kursiven Font
-gesetzt, au\ss er Funktionen (z.B. $\sin\Theta$) und Diffentialzeichen 'd' 
-(deswegen die Klimmz\"uge in obiger Formel im LATEX). Wenn man die Symbole im
-Text benutzt, z.B. den Weg $s$, dann macht man das auch mit {\em math mode}.
-Hervorhebungen in {\em kursiv}, oder {\bf fett}. Es gibt nat\"urlich auch 
-andere
-Schrifttypen z.B.\ {\sf Sans Serif}.
+The plot shown in Fig. \ref{erf_fit} (a) was made using the curve-fit-module in 
+Python. The datapoints were generated by averaging over two time intervalls for 
+different down times: for example in Fig. \ref{erf_fit} (b), we averaged over the 
+time intervall where the atom number was at a maximum and over the time period 
+right after the re-introduction of the laser beam at about 10 ms. These datapoints were then fitted to (8) in order to extract the temperature as a fit-patameter. 
 
-Hier noch etwas zu Bindestrichen: das - ist ein Binde-Strich f\"ur 
-zusammengesetzte Haupt\-w"or\-ter, das -- oder --- ein Gedankenstrich. 
+\bigskip
+This method then yielded the following temperature for the trapped Rubidium atoms inside the MOT (with $M=85.4678$ u for the Rb-gas \cite{Rbmass})
 
-Optionale
-Trennungen am Zeilen$\backslash$-ende im LATEX so (siehe z.B.\ das vorige 
-`Haupt\-w"or\-ter') im LATEX, falls es zu seltsamen
-Trennungen oder Nichttrennungen (oft bei deutschen Umlauten) kommt.
+\bigskip
+\underline{$T_{MOT}= (225 \pm 16)$ $\mu$K}
+
+\bigskip
+which is right in the order of magnitude which we hoped to achieve (see 1.1.2).
+Furthermore, the Fit has a $\chi^2_{red}$ of 2.8 showing that the model expressed by (8) does indeed describe the pyhsical subject accurately.
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -433,7 +462,7 @@ Trennungen oder Nichttrennungen (oft bei deutschen Umlauten) kommt.
 % regarding the temperature deviations from the gaussian profiles
 \subsection{Spectroscopy}
 \subsubsection{Multiplet Separation}
-The calibration value $\alpha$ is sufficiently accurate for the purposes of the experiment. It is noteworthy that the background is not truly a linear function as we assumed here, but rather is caused by overlap of the 87F2 and 85F3 dips. It may be possible to achieve better accuracy through the use of another gaussian background function, which would reflect the reality of the situation better.
+The calibration value $\alpha$ is sufficiently accurate for the purposes of the experiment. It is noteworthy that the background is not truly a linear function as we assumed here, but rather is caused by overlap of the 87F2 and 85F3 dips. It may be possible to achieve better accuracy through the use of another Gaussian background function, which would reflect the reality of the situation better.
 
 \subsubsection{Natural Transition Line Width and Doppler Broadening}
 While the temperatures we calculated are within the correct order of magnitude, their deviation from the expected $300\si{\kelvin}$ is quite large, suggesting that there is an underlying systematical uncertainty. Considering that the wider the range of the Lorentzian dips we had to mask is, the further the results stray from the expected value, we can assume that one of the most influential sources of this uncertainty is an inaccuracy in the fit. This is further confirmed by the fact that any uncertainty in $T$ stems purely from an uncertainty in $\sigma$ (with quadratic dependence), which is a fit parameter (see \autoref{temperature}). This method of calculating the temperature is perhaps better fit to be used on atomic samples in a different temperature range (such as close to absolute zero).
@@ -442,12 +471,12 @@ The Line Widths are all insignificantly different from the literature values, ex
 
 \subsubsection{Hyperfine Splitting}
 None of the evaluated separations deviate significantly from their respective literature values. The greatest source of uncertainty here is the SNR in the derivative. It might be possible to achieve better results through using the same method of rolling mean (with smaller N) and interpolation together with peak finding on the original dataset rather than the derivative, simply because its SNR is too high. That said, linear interpolation is, of course, an approximation of the real values and contributes to the uncertainty in these values. As shown in \autoref{interpolationuncertainty}, the uncertainty can be linear reciprocally reduced through increasing the density of the data points.
-
-
-
-\newpage
 %%% LARS ENDE
 
+\subsection{Loading Curves}
+In the process of generating the loss rate and loading rate coefficients, we managed to keep the percental error rather low (Fig. \ref{results_loading}). Here, the error mostly stems from the high noise of our photodiode, which was set to maximum gain and the actual fit uncertainty (which is also related to the high noise). Therefore, the one way to maximise the accuracy would be to encapsulate the whole experiment into a light-sealed box with more sensitive photo diodes. This would in turn yield more accurate maximal atom numbers (or intensities) and thereby imoprove the fit of (8). However, the biggest error is induced by averaging over the intensities left and right of the down time valley as seen in Fig. \ref{erf_fit} (b). This introduces an error statistical in nature, which reduces the MOT-temperature accuracy to 7.1\%. These rather large statistical errors can be seen in \ref{erf_fit} (a), where the error is propagated to the fraction $\frac{N(t)}{N(0)}$, creating large uncertainties for fractions approaching 1. The release-recapture-method is thus limited by its statistical approach and the high noise of the photo diode mentioned above. 
+
+In conclusion this methods yields a surprisingly accurate result with 7.1\% uncertainty considering the experimentation was a rather quick process. However, the evaluation of 70+ CSV-data-files is a laborious process and maybe could be automated by a program, if this procedure were to be integrated into a scientist's working routine.
 
 
 
@@ -472,44 +501,16 @@ None of the evaluated separations deviate significantly from their respective li
 
 
 
-
-
-
-
-
-
-
-
-Hier werden alle wesentlichen Ergebnisse nochmals angefuehrt und diskutiert.
-Bild~\ref{ps} 
-% \ref{ps} korrespondiert mit \label{ps}. Das kann man fuer
-% Bilder, Tabellen oder Abschnitte [\section, \subsection ...] benutzen und
-% muss nicht bei jeder Umstellung neu zaehlen und editieren.
-ist ein Beispiel fuer ein eingebundenes .ps (nicht .eps).
-Hier muss zus\"atzlich eine sog. {\em bounding box} eingegeben werden, das 
-sind die Bildgrenzen in Pixels, hier\\
-\centerline{\tt bbllx=112,bburx=447,bblly=264,bbury=582[,clip=1]}
-(bounding box lower left x, upper right x, dito y). Die {\it bounding box} 
-k\"onnen Sie beim Postscriptviewer gv mit dem Cursor ablesen. {\tt clip=1'}
-schneidet Grafik au\ss erhalb der {\it bounding box} ab, andernfalls 
-k\"onnen werden auch Bildteile au\ss erhalb wiedergegeben (und \"uberschreiben
-ggf. Text etc.).
-
-Am Schluss kann man noch eine allgemeinere Bemerkung zum Versuch machen.
 
 
 \newpage 
-%% hier wird 'von Hand' eine neue Seite erzwungen
+
 
 %% Literatur)
 
 \begin{thebibliography}{00}   % {00}: max 2-stellige Referenznummer
-\bibitem{script} C. Hofmann, M. Repp, V. Gavryusev , S. H\"afner, \href{https://www.physi.uni-heidelberg.de/Forschung/QD/f20wikinew/index.php/Main_Page}{F20-Wiki}, Fortgeschrittenenpraktikum Heidelberg, Faculty for Physics, University of Heidelberg
-\bibitem{afo} F. Afo, Nature 15 (1905) 23
-\bibitem{uwe} Uwe Ludwig, private Mitteilung
-\bibitem{karl} Karl Popper, Phys.~Rev.~Lett.~95 (2001) 25
-\bibitem{dipl} K. Winter, Diplomarbeit Heidelberg (1968)
-\bibitem{bibel} Genesis 3,4
+\bibitem{script} C. Hofmann, M. Repp, V. Gavryusev , S. H\"afner, \href{https://www.physi.uni-heidelberg.de/Forschung/QD/f20wikinew/index.php/Main_Page}{F20-Wiki}, Fortgeschrittenenpraktikum Heidelberg, Faculty for Physics, Heidelberg University
+\bibitem{Rbmass} \href{https://physics.nist.gov/PhysRefData/Handbook/Tables/rubidiumtable1.htm}{NIST: Basic Atomic Spectroscopic Data}
 
 \end{thebibliography}
 
