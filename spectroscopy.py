@@ -295,8 +295,8 @@ def hyperfine(plot=True, log=True):
             ax2.axhline(color="black", linestyle="--", alpha=0.4)
 
             # only label stuff once
-            plt.axvline(x=peaks[0].nominal_value, color="red", alpha=0.6, label="Solutions")
-            plt.axvline(x=peaks[0].nominal_value - peaks[0].std_dev, color="orange", alpha=0.6, label="Uncertainty in Solutions")
+            lns.append(plt.axvline(x=peaks[0].nominal_value, color="red", alpha=0.6, label="Solutions"))
+            lns.append(plt.axvline(x=peaks[0].nominal_value - peaks[0].std_dev, color="orange", alpha=0.6, label="Uncertainty"))
             plt.axvline(x=peaks[0].nominal_value + peaks[0].std_dev, color="orange", alpha=0.6)
 
             for peak in peaks[1:]:
