@@ -1,9 +1,10 @@
 
-from typing import List, Iterable, Sized, Callable, Sequence
+from typing import List, Iterable, Sized, Callable, Sequence, Union
 
 from scipy.optimize import fsolve
 from math import isclose
 import numpy as np
+from uncertainties import UFloat
 
 
 def u_to_kg(m):
@@ -152,5 +153,18 @@ def dsolve(xdata: Sequence, ydata: Sequence, *args, **kwargs):
     return fsolve(interpolate_data(xdata, ydata), *args, **kwargs)
 
 
-def average_close_points(xdata, ydata, delta):
-    pass
+def deviation(value: UFloat, lit_value: Union[float, UFloat]):
+    if isinstance(lit_value, UFloat):
+        sig = max(lit_value.std_dev, value.std_dev)
+    else:
+        sig = value.std_dev
+    return abs(lit_value - value.nominal_value) / sig
+
+
+def flatten(l: Iterable):
+    """ Flattens any Iterable """
+    for item in l:
+        if isinstance(item, Iterable):
+            yield from flatten(item)
+            continue
+        yield item

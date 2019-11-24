@@ -183,7 +183,7 @@ A_0 \exp{\frac{-(x - \mu)^2}{2 \sigma^2}} + ax + b
 \label{gaussianfit}
 \end{equation}
 
-Where $A_0$, $\mu$, $\sigma$, $a$, and $b$ were fit parameters, with $A_0$ representing the (negative) amplitude, $\mu$ the dip's mean value, $\sigma$ the standard deviation and $a$ and $b$ being background parameters. In order to achieve a better fit, the areas with the Lorentzian peaks were masked out beforehand.
+Where $A_0$, $\mu$, $\sigma$, $a$, and $b$ were fit parameters, with $A_0$ representing the (negative) amplitude, $\mu$ the dip's mean value, $\sigma$ the standard deviation and $a$ and $b$ being background parameters which account for dip overlap. In order to achieve a better fit, the areas with the Lorentzian peaks were masked out beforehand.
 
 \begin{figure}
     \centering
@@ -242,16 +242,96 @@ From the Standard Deviation of these Gaussian Profiles we can also calculate the
 
 \begin{equation}
 T = \sigma^2 \frac{mc^2}{\nu_0^2 k_B}
+\label{temperature}
 \end{equation}
 
 Where $m$ is the atomic mass of a single Rubidium atom, $c$ is the speed of light, $\nu_0 = \frac{c}{\lambda}$ is the laser frequency and $k_B$ is the Boltzmann constant. Since we are not yet cooling the sample, we would expect values around $300\si{\kelvin}$. The individual results are shown in \autoref{gaussianprofiles}.
 
+Once we've subtracted the Gaussian from the data, we can fit a Lorentzian curve to each of the individual peaks:
 
+\begin{equation}
+A_0 \underbrace{\frac{1}{\pi\gamma}\frac{\gamma^2}{(x-x_0)^2 + \gamma^2}}_\text{Standard Lorentzian} + ax + b
+\end{equation}
 
+Where $A_0$, $\gamma$, $x_0$ and $a$ and $b$ are fit parameters. $\gamma$ is the scale parameter and $x_0$ is the location parameter, but we also added an amplitude $A_0$ to the Lorentzian to account for different peak heights. As before, $ax + b$ is a linear background function which accounts for both noise and peak overlap.
 
+\begin{figure}
+    \centering
+    \parbox{0.45\textwidth}{
+        \includegraphics[width=0.5\textwidth]{lorentzianfull.png}
+    }
+    \hfill
+    \parbox{0.45\textwidth}{
+        \includegraphics[width=0.5\textwidth]{examplelorentzian.png}
+    }
+    \caption{Full and Zoomed Lorentzian Profile and Fit For Rb 87 $F = 2$}
+    \label{lorentzianprofile}
+\end{figure}
 
+Comparing the Natural Line Width $\gamma$ from the fits with the literature value $\gamma_{lit} \approx 6\si{\mega\hertz}$ \cite{script}, we receive the following values:
 
+\begin{table}[htb]
+\begin{center}
+\caption{Lorentzian Fit Results}
+\vspace{4mm}
+\begin{tabular}{|c|c|c|c|}\hline
+Isotope         & $F =$          & Fit Value in MHz   & Deviation from $\gamma_{lit}$ in $\sigma$ \\\hline
+85              & 2              & $7.9 \pm 1.1$      & 1.7\\
+85              & 2              & $13 \pm 4$         & 1.6\\
+85              & 3              & $7.3 \pm 2.8$      & 0.5\\
+85              & 3              & $7 \pm 4$          & 0.31\\
+85              & 3              & $4.6 \pm 0.8$      & 1.8\\
+87              & 1              & $9 \pm 4$          & 0.8\\
+87              & 1              & $9 \pm 4$          & 0.8\\
+87              & 1              & $11.0 \pm 1.2$     & 4.3\\
+87              & 2              & $6.7 \pm 0.4$      & 1.7\\
+87              & 2              & $5.3 \pm 0.8$      & 1.0\\\hline
+\end{tabular}
 
+\end{center}
+\end{table}
+
+Individual Lorentzian peaks for the same Isotope and energy level were considered from left to right. Note that not all peaks could be fitted due to the high SNR\footnote{Signal-to-Noise Ratio}. A full list of plots can be found in the appendix.
+
+\subsubsection{Hyperfine Splitting}
+
+Lastly, we want to determine the hyperfine energy level separations of each Isotope and fine energy level. This means we need to assign each Lorentzian peak a hyperfine energy level and then calculate their mean distance. Since we also recorded the derivative of these spectra, we used that to determine the location of the peaks. To achieve this, we interpolated all neighboring points in each dataset with a linear function $f = ax + b$ and then solved $f$ for $0$ over the whole data range. Unfortunately, the SNR of these datasets was very high, on the order of up to $\approx 400\%$. To greatly reduce this, we introduced a rolling mean to each dataset, averaging over $20$ datapoints prior to interpolation. This reduced the overall SNR to $\approx 25\%$, which enabled us to solve $f$ at all, but introduces a statistical error in the solutions of $f$. This uncertainty can be estimated with the mean difference of data points on the (monotonically increasing) horizontal axis as well as the number of points we average over:
+\begin{equation}
+\Delta f_0 = N \cdot \frac{1}{n} \sum_{i = 1}^{n - 1} \left\lvert x_{i + 1} - x_i \right\rvert
+\label{interpolationuncertainty}
+\end{equation}
+Where $f_0$ is a solution, $N = 20$ is the number of points averaged over and $n = 1000$ is the number of points in the dataset, with $x_i$ being the $i$-th point in the dataset.
+
+\begin{figure}
+    \centering
+    \parbox{0.45\textwidth}{
+        \includegraphics[width=0.5\textwidth]{originalderivative.png}
+    }
+    \hfill
+    \parbox{0.45\textwidth}{
+        \includegraphics[width=0.5\textwidth]{averagedderivative.png}
+    }
+    \caption{Left: Signal with Original Derivative. Right: Signal with Averaged Derivative and Solutions}
+    \label{lorentzianprofile}
+\end{figure}
+
+\begin{table}[htb]
+\begin{center}
+\caption{Hyperfine Separation Results\protect\footnotemark}
+\vspace{4mm}
+\begin{tabular}{|c|c|c|c|c|c|c|}\hline
+Isotope     & $F =$  & $F'_1 =$   & $F'_2 =$   & Experimental Value [MHz]   & Literature Value [MHz]     & Deviation in $\sigma$ \\\hline
+85          & 2      & 2          & 3          & $74 \pm 5$                 & $63.401(61)$               & 2.1\\
+85          & 3      & 3          & 4          & $137 \pm 7$                & $120.640(68)$              & 2.3\\
+87          & 1      & 0          & 1          & $92 \pm 10$                & $72.2180(40)$              & 2.0\\
+87          & 1      & 1          & 2          & $131 \pm 10$               & $156.9470(70)$             & 2.6\\
+87          & 1      & 0          & 2          & $223 \pm 10$               & $229.165(11)$              & 0.6\\
+87          & 2      & 2          & 3          & $305 \pm 13$               & $266.6500(90)$             & 2.9\\\hline
+\end{tabular}
+
+\end{center}
+\end{table}
+\footnotetext{Literature Values taken from \cite{script}.}
 
 
 
@@ -337,7 +417,17 @@ Trennungen oder Nichttrennungen (oft bei deutschen Umlauten) kommt.
 \section{Discussion and Critical Analysis}
 
 % regarding the temperature deviations from the gaussian profiles
-It is noteworthy that while these are within the correct order of magnitude, their deviation from the expected $300\si{\kelvin}$ is quite large, suggesting that there is an underlying systematical uncertainty. Considering that the wider the range of the Lorentzian dips we had to mask is, the further the results stray from the expected value, we can assume that one of the most influential sources of this uncertainty is an inaccuracy in the fit. This is further confirmed by the fact that any uncertainty in $T$ stems purely from an uncertainty in $\sigma$ (with quadratic dependence), which is a fit parameter.
+\subsection{Spectroscopy}
+\subsubsection{Multiplet Separation}
+The calibration value $\alpha$ is sufficiently accurate for the purposes of the experiment. It is noteworthy that the background is not truly a linear function as we assumed here, but rather is caused by overlap of the 87F2 and 85F3 dips. It may be possible to achieve better accuracy through the use of another gaussian background function, which would reflect the reality of the situation better.
+
+\subsubsection{Natural Transition Line Width and Doppler Broadening}
+While the temperatures we calculated are within the correct order of magnitude, their deviation from the expected $300\si{\kelvin}$ is quite large, suggesting that there is an underlying systematical uncertainty. Considering that the wider the range of the Lorentzian dips we had to mask is, the further the results stray from the expected value, we can assume that one of the most influential sources of this uncertainty is an inaccuracy in the fit. This is further confirmed by the fact that any uncertainty in $T$ stems purely from an uncertainty in $\sigma$ (with quadratic dependence), which is a fit parameter (see \autoref{temperature}). This method of calculating the temperature is perhaps better fit to be used on atomic samples in a different temperature range (such as close to absolute zero).
+
+The Line Widths are all insignificantly different from the literature values, except for the final 87 $F = 1$ fit. Since we have a rather high SNR here, we can assume that this is the most influential source of any uncertainties which present themselves here. For these fits, it is imperative that the data points be very dense in the area of the fit, which was not necessarily achieved well here due to limitations in the lab equipment. Better fits and as such more accurate Line Widths could be produced by making more accurate measurements closer to the peaks as an additional measurement. Laser noise also plays a great role in these measurements.
+
+\subsubsection{Hyperfine Splitting}
+None of the evaluated separations deviate significantly from their respective literature values. The greatest source of uncertainty here is the SNR in the derivative. It might be possible to achieve better results through using the same method of rolling mean (with smaller N) and interpolation together with peak finding on the original dataset rather than the derivative, simply because its SNR is too high. That said, linear interpolation is, of course, an approximation of the real values and contributes to the uncertainty in these values. As shown in \autoref{interpolationuncertainty}, the uncertainty can be linear reciprocally reduced through increasing the density of the data points.
 
 
 

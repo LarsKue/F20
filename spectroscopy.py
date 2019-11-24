@@ -229,14 +229,22 @@ def lorentzfit(lorentz_data, plot=True, return_gammas=False):
 
             gamma = ufloat(popt[1], np.sqrt(pcov[1][1]))
 
-            gammas.append(voltage_to_freq(gamma) * 1e-6)
+            gamma = voltage_to_freq(gamma) * 1e-6
+            print("gamma =", gamma, "MHz")
+            print("deviation:", deviation(gamma, 6))
+
+            gammas.append(gamma)
 
             if plot:
-                plt.plot(data_out, data_in, marker=".")
+                plt.figure(figsize=(8, 6))
+                plt.plot(data_out, data_in, marker=".", label="data")
                 plt.xlim(plt.axes().get_xlim())
                 plt.ylim(plt.axes().get_ylim())
                 x = np.linspace(data_out[0], data_out[-1], 10000)
-                plt.plot(x, lorentzian(x, *popt))
+                plt.plot(x, lorentzian(x, *popt), label="Lorentzian Fit")
+                plt.xlabel("Aux Out [V]")
+                plt.ylabel("Aux In [V]")
+                plt.legend(loc="upper left")
 
                 plt.show()
 
@@ -270,11 +278,15 @@ def hyperfine(plot=True, log=True):
             # print("{}".format(voltage_to_freq(np.diff(peaks)) * 1e-6))
 
         if plot:
+
+            # single legend
+            lns = []
+
             fig, ax1 = plt.subplots(figsize=(10, 8))
             color = "tab:blue"
             ax1.set_xlabel("Aux Out [V]")
             ax1.set_ylabel("Aux In [V]", color=color)
-            ax1.plot(data_out, data_in, color=color)
+            lns.append(ax1.plot(data_out, data_in, color=color, label="data"))
             # ax1.plot(mask_rolling_mean(data_out, mean_N), rolling_mean(data_in, mean_N), color="orange")
             # ax1.plot(mask_rolling_mean(data_out, mean_N), smooth_data_in, color=color)
             ax1.tick_params(axis="y", labelcolor=color)
@@ -282,27 +294,38 @@ def hyperfine(plot=True, log=True):
             ax2 = ax1.twinx()
             ax2.axhline(color="black", linestyle="--", alpha=0.4)
 
-            for x0 in peaks:
-                plt.axvline(x=x0.nominal_value, color="red", alpha=0.6)
-                plt.axvline(x=x0.nominal_value - x0.std_dev, color="orange", alpha=0.6)
-                plt.axvline(x=x0.nominal_value + x0.std_dev, color="orange", alpha=0.6)
+            # only label stuff once
+            plt.axvline(x=peaks[0].nominal_value, color="red", alpha=0.6, label="Solutions")
+            plt.axvline(x=peaks[0].nominal_value - peaks[0].std_dev, color="orange", alpha=0.6, label="Uncertainty in Solutions")
+            plt.axvline(x=peaks[0].nominal_value + peaks[0].std_dev, color="orange", alpha=0.6)
+
+            for peak in peaks[1:]:
+                plt.axvline(x=peak.nominal_value, color="red", alpha=0.6)
+                plt.axvline(x=peak.nominal_value - peak.std_dev, color="orange", alpha=0.6)
+                plt.axvline(x=peak.nominal_value + peak.std_dev, color="orange", alpha=0.6)
 
             color = "tab:green"
             ax2.set_ylabel("PDH [a.u.]", color=color)
-            # ax2.plot(data_out, pdh, color="orange")  # original pdh
-            ax2.plot(mask_rolling_mean(data_out, mean_N), smooth_pdh, color=color)
+            # lns.append(ax2.plot(data_out, pdh, color=color, label="derivative"))  # original pdh
+            lns.append(ax2.plot(mask_rolling_mean(data_out, mean_N), smooth_pdh, color=color, label="averaged derivative"))
 
             ax2.tick_params(axis="y", labelcolor=color)
 
+            lns = list(flatten(lns))
+            labs = [l.get_label() for l in lns]
+
+            ax1.legend(lns, labs, loc="upper left")
+
             plt.show()
 
-    values = [74, 137, 92, 131, 223, 305]
-    lvalues = [63.40161, 120.64068, 72.218040, 156.947070, 229.16511, 266.650090]
-    deltas = [5, 7, 10, 10, 10, 13]
-
-    for v, l, d in zip(values, lvalues, deltas):
-        sig = abs(v - l) / d
-        print(sig)
+    # values = [74, 137, 92, 131, 223, 305]
+    # lvalues = [63.40161, 120.64068, 72.218040, 156.947070, 229.16511, 266.650090]
+    # deltas = [5, 7, 10, 10, 10, 13]
+    # deltas = [1.1, 1.5, 2.2, 2.2, 2.2, 2.9]
+    #
+    # for v, l, d in zip(values, lvalues, deltas):
+    #     sig = abs(v - l) / d
+    #     print(sig)
 
 
 """
@@ -327,9 +350,9 @@ Separations:
 
 
 def main(argv: list) -> int:
-    calibration(plot=True, log=True)
-    lorentz_data = list(get_lorentz_data(plot=True, log=True))
-    lorentzfit(lorentz_data, plot=True)
+    calibration(plot=False, log=False)
+    lorentz_data = list(get_lorentz_data(plot=False, log=False))
+    lorentzfit(lorentz_data, plot=False)
     hyperfine(plot=True, log=True)
     return 0
 
