@@ -201,16 +201,16 @@ intensity x-beam: $4.8$ mW $\pm$ $0.4$ mW; background: $13$ $\mu$W $\pm$ $3$ $\m
 \subsection{Spectroscopy}
 \subsubsection{Multiplet Separation}
 
-During the experiment, all data was recorded as a voltage rather than frequency, energy, et cetera. Therefore, to analyse the spectral data of the Rubidium 85 and 87 D2 lines, we first need to calibrate the horizontal axis. In all atoms, energy levels are only observable through absorption or emission of a photon by an electron jumping from one level to another. Due to this, it is not possible to know the absolute energy a level possesses. Only the difference between two levels is observable. As such, we can only infer a cardinal interval scale to the horizontal axis, meaning the zero point is arbitrary.
+During the experiment, all data was recorded in voltages. Therefore, to analyse the spectral data of the Rubidium 85 and 87 D2 lines, we first need to calibrate the horizontal axis. Due to the fact we can only observe a difference between energy levels, we can only infer a cardinal interval scale to the horizontal axis, meaning the zero point is arbitrary.
 
-First, we plotted the full spectrum in which all fine energy level dips are visible. The plot looked as we anticipated, showing 4 separated large (Gaussian) dips, each accommodated with several smaller (Lorentzian) peaks near their middle. In order to find the mean value each dip is at, we fitted a Gaussian added with a linear background function to each of the profiles:
+First, we plotted the full spectrum in which all fine energy level dips are visible. In order to find the mean value each dip is at, we fitted a Gaussian added with a linear background function to each of the profiles:
 
 \begin{equation}
 A_0 \exp{\frac{-(x - \mu)^2}{2 \sigma^2}} + ax + b
 \label{gaussianfit}
 \end{equation}
 
-Where $A_0$, $\mu$, $\sigma$, $a$, and $b$ were fit parameters, with $A_0$ representing the (negative) amplitude, $\mu$ the dip's mean value, $\sigma$ the standard deviation and $a$ and $b$ being background parameters which account for dip overlap. In order to achieve a better fit, the areas with the Lorentzian peaks were masked out beforehand.
+Where $A_0$ represents the (negative) amplitude, $\mu$ the dip's mean value, $\sigma$ the standard deviation and $a$ and $b$ are background fit parameters which account for dip overlap. In order to achieve a better fit, the areas with the Lorentzian peaks were masked out beforehand.
 
 \begin{figure} [h]
     \centering
@@ -229,22 +229,14 @@ Where $A_0$, $\mu$, $\sigma$, $a$, and $b$ were fit parameters, with $A_0$ repre
 Using the separations in $(\mu \pm \sigma)$ from one another, we can derive the calibration from the literature value of these separations. With the literature value\footnote{$= 6.8346826109042(90)\;\si{\giga\hertz}$\cite{script}} for the larger separation between Rubidium 87 $F = 1$ and $F = 2$, we can calculate
 
 \begin{equation}
-\alpha^{-1} \equiv \dv{V}{f} = (1.9366 \pm 0.0008) \cdot 10^{-10} \quad \si{\frac{\volt}{\hertz}}
-\end{equation}
-
-We then assume a linear proportionality $f \propto \alpha V$ and use $\alpha$ to convert any difference in volts $\Delta V$ to a difference in Hertz $\Delta f$:
-
-\begin{equation}
-\Delta f (\Delta V) = \alpha \Delta V
+\alpha^{-1} \equiv \dv{V}{f} = (1.9366 \pm 0.0008) \cdot 10^{-10} \quad \si{\frac{\volt}{\hertz}} \quad \Rightarrow \quad \Delta f (\Delta V) = \alpha \Delta V
 \label{conversion}
 \end{equation}
 
-Comparing the literature value of the separation in the Rubidium 85 $F = 2$ and $F = 3$ dips\footnote{$=3.0357324390(60) \;\si{\giga\hertz}$\cite{script}} with the one calculated from \autoref{conversion}, we can estimate an uncertainty in $\alpha$, which we found to be $(0.71 \pm 0.06) \%$. This is sufficiently accurate for the purposes of this experiment.
-
+Where a linear proportionality $f \propto \alpha V$ was assumed. Comparing the literature value of the separation in the Rubidium 85 $F = 2$ and $F = 3$ dips\footnote{$=3.0357324390(60) \;\si{\giga\hertz}$\cite{script}} with the one calculated from \autoref{conversion}, we can estimate an uncertainty in $\alpha$, which we found to be $(0.71 \pm 0.06) \%$.
 \subsubsection{Natural Transition Line Width and Doppler Broadening}
 
 We then analysed the spectra we recorded for each individual Gaussian dip. Once again using \autoref{gaussianfit} as the fit function while masking out the Lorentzian peaks, we received a Gaussian profile which we could then subtract from the data in order to further analyse the Lorentzian peaks.
-
 \begin{figure}
     \centering
     \parbox{0.45\textwidth}{
@@ -264,7 +256,6 @@ We then analysed the spectra we recorded for each individual Gaussian dip. Once 
     \caption{Gaussian Profiles}
     \label{gaussianprofiles}
 \end{figure}
-
 From the Standard Deviation of these Gaussian Profiles we can also calculate the temperature of the atomic sample:
 
 \begin{equation}
@@ -272,15 +263,13 @@ T = \sigma^2 \frac{mc^2}{\nu_0^2 k_B}
 \label{temperature}
 \end{equation}
 
-Where $m$ is the atomic mass of a single Rubidium atom, $c$ is the speed of light, $\nu_0 = \frac{c}{\lambda}$ is the laser frequency and $k_B$ is the Boltzmann constant. Since we are not yet cooling the sample, we would expect values around $300\si{\kelvin}$. The individual results are shown in \autoref{gaussianprofiles}.
-
-Once we've subtracted the Gaussian from the data, we can fit a Lorentzian curve to each of the individual peaks:
+Where $m$ is the atomic mass of a single Rubidium atom, $c$ is the speed of light, $\nu_0 = \frac{c}{\lambda}$ is the laser frequency and $k_B$ is the Boltzmann constant. The individual results are shown in \autoref{gaussianprofiles}. Once we've subtracted the Gaussian from the data, we can fit a Lorentzian curve to each of the individual peaks:
 
 \begin{equation}
 A_0 \underbrace{\frac{1}{\pi\gamma}\frac{\gamma^2}{(x-x_0)^2 + \gamma^2}}_\text{Standard Lorentzian} + ax + b
 \end{equation}
 
-Where $A_0$, $\gamma$, $x_0$ and $a$ and $b$ are fit parameters. $\gamma$ is the scale parameter and $x_0$ is the location parameter, but we also added an amplitude $A_0$ to the Lorentzian to account for different peak heights. As before, $ax + b$ is a linear background function which accounts for both noise and peak overlap.
+Where $\gamma$ is the scale parameter and $x_0$ is the location parameter, but we also added an amplitude $A_0$ to the Lorentzian to account for different peak heights. As before, $ax + b$ is a linear background function which accounts for both noise and peak overlap.
 
 \begin{figure}
     \centering
@@ -338,14 +327,14 @@ Where $f_0$ is a solution, $N = 20$ is the number of points averaged over and $n
     \parbox{0.45\textwidth}{
         \includegraphics[width=0.5\textwidth]{averagedderivative.png}
     }
-    \caption{Left: Signal with Original Derivative. Right: Signal with Averaged Derivative and Solutions}
+    \caption{\small Left: Signal with Original Derivative. Right: Signal with Averaged Derivative and Solutions}
     \label{lorentzianprofile}
 \end{figure}
 
 \begin{table}[htb]
 \begin{center}
 \caption{Hyperfine Separation Results\protect\footnotemark}
-\vspace{4mm}
+\vspace{0.25mm}
 \begin{tabular}{|c|c|c|c|c|c|c|}\hline
 Isotope     & $F =$  & $F'_1 =$   & $F'_2 =$   & Experimental Value [MHz]   & Literature Value [MHz]     & Deviation in $\sigma$ \\\hline
 85          & 2      & 2          & 3          & $74 \pm 5$                 & $63.401(61)$               & 2.1\\
@@ -466,12 +455,12 @@ Furthermore, the Fit has a $\chi^2_{red}$ of 2.8 showing that the model expresse
 The calibration value $\alpha$ is sufficiently accurate for the purposes of the experiment. It is noteworthy that the background is not truly a linear function as we assumed here, but rather is caused by overlap of the 87F2 and 85F3 dips. It may be possible to achieve better accuracy through the use of another Gaussian background function, which would reflect the reality of the situation better.
 
 \subsubsection{Natural Transition Line Width and Doppler Broadening}
-While the temperatures we calculated are within the correct order of magnitude, their deviation from the expected $300\si{\kelvin}$ is quite large, suggesting that there is an underlying systematical uncertainty. Considering that the wider the range of the Lorentzian dips we had to mask is, the further the results stray from the expected value, we can assume that one of the most influential sources of this uncertainty is an inaccuracy in the fit. This is further confirmed by the fact that any uncertainty in $T$ stems purely from an uncertainty in $\sigma$ (with quadratic dependence), which is a fit parameter (see \autoref{temperature}). This method of calculating the temperature is perhaps better fit to be used on atomic samples in a different temperature range (such as close to absolute zero).
+While the temperatures we calculated are within the correct order of magnitude, their deviation from the expected $300\si{\kelvin}$ is quite large, suggesting that there is an underlying systematical uncertainty. One of the most influential sources of this uncertainty is an inaccuracy in the fit, e.g. due to masking. This is further confirmed by the fact that any uncertainty in $T$ stems purely from an uncertainty in $\sigma$ (with quadratic dependence), which is a fit parameter (see \autoref{temperature}). This method of calculating the temperature is perhaps better fit to be used on atomic samples in a different temperature range (such as close to absolute zero).
 
-The Line Widths are all insignificantly different from the literature values, except for the final 87 $F = 1$ fit. Since we have a rather low SNR here, we can assume that this is the most influential source of any uncertainties which present themselves here. For these fits, it is imperative that the data points be very dense in the area of the fit, which was not necessarily achieved well here due to limitations in the lab equipment. Better fits and as such more accurate Line Widths could be produced by making more accurate measurements closer to the peaks as an additional measurement. Laser noise also plays a great role in these measurements.
+The Line Widths are all insignificantly different from the literature values, except for the final 87 $F = 1$ fit. Since we have a rather low SNR here, we can assume that this is the most influential source of any uncertainties here. For these fits, it is imperative that the data points be very dense in the area of the fit, which was not necessarily achieved well here due to limitations in the lab equipment. Laser noise also plays a great role in these measurements.
 
 \subsubsection{Hyperfine Splitting}
-None of the evaluated separations deviate significantly from their respective literature values. The greatest source of uncertainty here is the SNR in the derivative. It might be possible to achieve better results through using the same method of rolling mean (with smaller N) and interpolation together with peak finding on the original dataset rather than the derivative, simply because its SNR is too low. That said, linear interpolation is, of course, an approximation of the real values and contributes to the uncertainty in these values. As shown in \autoref{interpolationuncertainty}, the uncertainty can be linear reciprocally reduced through increasing the density of the data points.
+None of the evaluated separations deviate significantly from their respective literature values. The greatest source of uncertainty here is the SNR in the derivative. It might be possible to achieve better results through using the same method of rolling mean (with smaller N) and interpolation together with peak finding on the original dataset rather than the derivative, simply because its SNR is too low. As also shown in \autoref{interpolationuncertainty}, the interpolation uncertainty can be linear reciprocally reduced through increasing the density of the data points.
 %%% LARS ENDE
 
 \subsection{Loading Curves}
