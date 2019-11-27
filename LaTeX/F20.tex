@@ -68,62 +68,9 @@ Audited as a special evaluation: Date, Signature:
 \subsection{Basic Overview of Physical Subjects}
 The Magneto-Opitcal Trap makes use of an abundance of physical topics mainly focussed around atomic pyhsics, optics and spectroscopy. The following section aims to provide an overview of these topics without an in-depth explanation. The source of all the information summarised in Chapter 1 is \cite{script}, where one can find more in-depth information on the subject.
 \subsubsection{Level Structure of Rubidium Atoms and Laser Spectroscopy}
-\begin{figure}
-    \centering
-    \parbox{0.4\textwidth}{
-        \centering
-        \includegraphics[width=0.4\textwidth]{800px-Doppler_spectroscopy.png}
-    }
-
-    \caption{Schematic sketch of the spectroscopy path with:  PBS being a polarizing beam splitter, GT means Galilean Telescope and H references a half waveplate, \cite{script}}
-    \label{doppler_spect}
-\end{figure}
-
-As shown in Fig.\ref{doppler_spect}, the laser beam passes a Rb vapour cell before hitting a photo diode, where the intensity is evaluated. Simultaneously, the laser scans through various frequencies to measure an intensity response. As the laser propagates through the gas, the stimulated atomic state transitions have an effect on the laser intensity following the Lambert-Beer law:
-\begin{equation}
-\frac{dI}{dx}= -\kappa I
-\end{equation}
-where $\kappa = h\nu n_0 \alpha (P_0 - P_1)$ denotes the absorption coefficient, $x$ the path and $I$ the beam intensity. Furthermore:
-\begin{equation}
-\alpha = \alpha_0 \mathcal{L}(\nu , \nu_0)
-\end{equation}
-describes the frequency dependence of $\kappa$, which has a Lorentzian shape. The expression $P_0 - P_1$ gives us the relation between atoms in the excited ($P_1$) versus the ground state ($P_0$). The fraction $\frac{P_1}{P_0}$ has a Gaussian shape and depends on frequency and temperature.
-A complication for evaluating the exact position of absorption dips are the Doppler shifts created through the movement of the atoms in the vapour cell. The so-called "Doppler broadening" which we then can observe in our Intensity-Frequency-diagram has a Gaussian shape with the standard deviation being:
-\begin{equation}
-\sigma_v = \sqrt{\frac{k_B T}{m}}
-\end{equation}
-where $T$ denotes the temperature, $k_B$ the Boltzmann constant and $m$ the mass of a particle. Through all these considerations, we can then describe the different populations of $P_0$ and $P_1$ accordingly and arrive at the Doppler free spectroscopy: instead of using one single beam, we use a probing beam and a pumping beam which are detuned in the order of a few Megahertz to evaluate the Doppler shift dependeny. The interplay of these two beams creates a so-called "saturated absorption dip" right at the resonance frequency without doppler shifting but depends on $\frac{I}{I_{sat}}$ with $I_{sat}$ being the saturation intensity, which depends on spontaneous emission rate of the atoms and $\alpha$.
-
-\begin{figure}
-    \centering
-    \parbox{0.4\textwidth}{
-        \centering
-        \includegraphics[width=0.4\textwidth]{Rb_satabs.png}
-    }
-
-    \caption{measured spectra with cross-over resonances, \cite{script}}
-    \label{measured_spec}
-\end{figure}
-
-Since the Rubidium atoms have a more complicated V-shaped energy level schematic (two upper energy levels and one lower), the process creates crossover-peaks which can be observed in the Gaussian absorption dip.
-Rubidium has fine structure levels with L-S coupling
-\begin{equation}
-\vec{J} = \vec{L} + \vec{S}
-\end{equation}
-($\vec{J}$ = total electronic angular momentum, $\vec{L}$ = total orbital angular momentum, $\vec{S}$ = total electronic spin angular momentum)
-
-and hyperfine structure levels with I-J coupling
-\begin{equation}
-\vec{F} = \vec{I} + \vec{J}
-\end{equation}
-($\vec{F}$ = total angular momentum, $\vec{I}$ = spin angular momentum)
-which complicate the doppler-free absorption spectrum even further.
-All these effects can be seen in accumulation in Fig.\ref{measured_spec}
-
-Also, we make use of frequency modulation spectroscopy in order to measure the Lamb-dips and cross-overs as well as to stabilise the laser in the MOT-part of the experiment. Through a series of effects, one gets a derivative of the absorption signal and therefore can estimate the position of the absorption dip more accurately. This whole process is done in the spectroscopy-branch of the experimental setup. \cite{script}
-
+The central physical themes here inlcude laser absorption spectroscopy, Doppler shifting due to the movement of the gas atoms, populations for different energy states within the atomic level, saturated absorpion and Doppler free spectroscopy, multilevel effects, energy levels of Rubidium (fine structure and hyper-fine structure levels) and frequency modulation. For a comprehensive explanation of these concepts, please refer to \cite{script}.
 \subsubsection{Magneto-Optical Trap}
-The Magneto-Optical trap used to cool atoms to a few $100\ \mu  K$ uses two main principles: the effect of optical molasses and the Zeeman-effect, which occurs under the influence of an external magetic field gradient. The linear momentum imposed upon atoms by light can be written as $p=\hbar k$. Furthermore $\hbar \omega$ changes the internal energy of an atom and the angular momentum has effect on the orbital angular momentum $l$ with the selection rule $\Delta l=\pm 1$. Through these elementary processes, the atoms are slowed down in the optical molasses (OM): two opposing standing-wave laser beams dampen the atomic motion where the force $\vec{F}_{OM}$ is proportional to the velocity of the atoms $-\vec{v}$. This process only works in cooperation with the doppler-free spectroscopy, since the resonance frequencies must be "scanned" and acquired.
+The Magneto-Optical trap used to cool atoms to a few $100\ \mu  K$ uses two main principles: the effect of optical molasses and the Zeeman-effect, which occurs under the influence of an external magetic field gradient. The linear momentum imposed upon atoms by light can be written as $p=\hbar k$, where $\hbar=\frac{h}{2\pi}$ and $h$ is the Planck constant and $k$ is the wavenumber. Furthermore $\hbar \omega$ , where $\omega$ is the angular frequency of the light, changes the internal energy of an atom and the angular momentum has effect on the orbital angular momentum $l$ with the selection rule $\Delta l=\pm 1$. Through these elementary processes and the red shifting of the laser, the atoms are slowed down in the optical molasses (OM): two opposing standing-wave laser beams dampen the atomic motion where the force $\vec{F}_{OM}$ is proportional to the velocity of the atoms $-\vec{v}$. This process only works in cooperation with the doppler-free spectroscopy, since the resonance frequencies must be "scanned" and acquired.
 
 However, there are limits to cooling via OM: the recoil limit (for $^{85}Rb$, $T_r = 0.370\mu K$) and doppler temperature limit (for $^{85}Rb$, $T_D = 143.41\mu K$), which limit the cooling to a few hundreds of $\mu K$.
 
@@ -147,7 +94,7 @@ where $\chi = \sqrt{\frac{M}{k_{b} T}}\frac{R}{t}$, $t$ is the time stamp at whi
 
 
 \subsection{Goal of the Experiment}
-The goal of the experiment is to analise doppler-free spectra and match atomic transitions to dips in our measurements as well as to calculate the MOT-temperature with the trap turned off. In the second part of the experiment we acquire $\alpha$ and $L$ in dependency of different detuning frequencies and Helmholtz-coil currents in order to generate the parameters which maximise the number of trapped atoms. Then, through a release-recapture measurement, we calculate the temperature of the MOT.
+The goal of the experiment is to analise doppler-free spectra and match atomic transitions to dips in our measurements as well as to calculate the Rubidium gas cylinder temperature located in the spectroscopy branch. In the second part of the experiment we acquire $\alpha$ and $L$ in dependency of different detuning frequencies and Helmholtz-coil currents in order to generate the parameters which maximise the number of trapped atoms. Then, through a release-recapture measurement, we calculate the temperature of the MOT.
 
 
 \section{Experimental Setup}
@@ -161,9 +108,9 @@ The goal of the experiment is to analise doppler-free spectra and match atomic t
 \end{figure}
 
 \subsection{Diode lasers and laser locking}
-This experiment is equipped with two home-built external cavity diode lasers for addressing the cooling transition and the repumping transition. The frequency of both lasers can be altered with an in-built acousto-optic modulator (AOM). The piezo crystal, which generates the AOM, can be influenced by changing the offset voltage on the controller (Thorlabs MDT693A).
+This experiment is equipped with a home-built external cavity diode laser for addressing the cooling transition and the repumping transition. The frequency of the laser can be altered with an in-built acousto-optic modulator (AOM) and an EOM for the MOT branch (see Fig. \ref{expsetup}). The piezo crystal, which generates the AO-modulation, can be influenced by changing the offset voltage on the controller (Thorlabs MDT693A).
 
-In order to stabilise the laser signal (no fluctuations in intensity and frequency), we make use of a digital PID controller (Toptica Digilock 110). This device was also used to change the detuning of the two laser beams by adjusting a screw on the front panel of the device.
+In order to stabilise the laser signal (no fluctuations in intensity and frequency), we make use of a digital PID controller (Toptica Digilock 110). We used an AOM-driver to change the detuning of the two laser beams by adjusting a screw on the front panel of the device.
 
 These devices allow for a laser accuracy of 1MHz, which is less than the natural linewidth of the atomic transition.
 
@@ -237,7 +184,7 @@ Where a linear proportionality $f \propto \alpha V$ was assumed. Comparing the l
 \subsubsection{Natural Transition Line Width and Doppler Broadening}
 
 We then analysed the spectra we recorded for each individual Gaussian dip. Once again using \autoref{gaussianfit} as the fit function while masking out the Lorentzian peaks, we received a Gaussian profile which we could then subtract from the data in order to further analyse the Lorentzian peaks.
-\begin{figure}
+\begin{figure} [h]
     \centering
     \parbox{0.45\textwidth}{
         \includegraphics[width=0.5\textwidth]{gaussian1.png}
@@ -357,7 +304,7 @@ Isotope     & $F =$  & $F'_1 =$   & $F'_2 =$   & Experimental Value [MHz]   & Li
 
 \subsection{Loading Curves}
 \subsubsection{Generation of Loading Parameters, Optimisation of Loading Process}
-The measurements as seen in Fig. \ref{examplemeas} (a) consisted of measured power meter voltage on the y-axis and time on the x-axis. In order to make use of these measurements, the voltage had to be converted into atom number (this rather complicated mathematical procedure shall only be mentioned here, the exact derivation can be found here \cite{script}). The loading curve with a subtracted background was then fitted to equation (7). This fit then allowed us to generate the parameters $\alpha$, $L$ and $N_{max}$ for varying detunings of the laser and currents through the anti-Helmholtz-coil. We then plotted these results in order to have an overwiev of the optimal parameters which generate the highest atom number and resolution (Fig. \ref{results_loading}). For completion, the magnetic gradient is calculated via:
+The measurements as seen in Fig. \ref{examplemeas} (a) consisted of measured photo-diode voltage on the y-axis and time on the x-axis. In order to make use of these measurements, the voltage had to be converted into atom number (this rather complicated mathematical procedure shall only be mentioned here, the exact derivation can be found here \cite{script}). The loading curve with a subtracted background was then fitted to equation (7). This fit then allowed us to generate the parameters $\alpha$, $L$ and $N_{max}$ for varying detunings of the laser and currents through the anti-Helmholtz-coil. We then plotted these results in order to have an overwiev of the optimal parameters which generate the highest atom number and resolution (Fig. \ref{results_loading}). For completion, the magnetic gradient is calculated via:
 \begin{equation}
 \frac{dB}{dz}(z=\frac{R}{2})=1.1\times 10^{-6}\frac{NI}{R^2}
 \end{equation}
@@ -445,7 +392,7 @@ Furthermore, the Fit has a $\chi^2_{red}$ of 2.8 showing that the model expresse
 
 %%% LARS ANFANG %%%
 
-\newpage
+
 
 \section{Discussion and Critical Analysis}
 
@@ -466,7 +413,9 @@ None of the evaluated separations deviate significantly from their respective li
 \subsection{Loading Curves}
 In the process of generating the loss rate and loading rate coefficients, we managed to keep the percental error rather low (Fig. \ref{results_loading}). Here, the error mostly stems from the high noise of our photodiode, which was set to maximum gain and the actual fit uncertainty (which is also related to the high noise). Therefore, the one way to maximise the accuracy would be to encapsulate the whole experiment into a light-sealed box with more sensitive photo diodes. This would in turn yield more accurate maximal atom numbers (or intensities) and thereby imoprove the fit of (8). However, the biggest error is induced by averaging over the intensities left and right of the down time valley as seen in Fig. \ref{erf_fit} (b). This introduces an error statistical in nature, which reduces the MOT-temperature accuracy to 7.1\%. These rather large statistical errors can be seen in \ref{erf_fit} (a), where the error is propagated to the fraction $\frac{N(t)}{N(0)}$, creating large uncertainties for fractions approaching 1. The release-recapture-method is thus limited by its statistical approach and the high noise of the photo diode mentioned above.
 
-In conclusion this methods yields a surprisingly accurate result with 7.1\% uncertainty considering the experimentation was a rather quick process. However, the evaluation of 70+ CSV-data-files is a laborious process and maybe could be automated by a program, if this procedure were to be integrated into a scientist's working routine.
+In terms of new understanding, we found out that a detuning of about $-8.5$ MHz drastically maximises the loss rate $\alpha$ for a coil current of about $9.5$ A, whereas other currents and detunings leave the loss rate relatively uninfluenced and show a plateau. The same goes for the loss rate $L$. Interestingly, where the loss rate and $\alpha$ are minimal ($\approx -7.5$ MHz detuning, see Fig. \ref{results_loading}), we get the highest maximal atom number for a coil current of $10.35$ A. This is only logical and shows that our approach by equation (7) did indeed describe loss rates and one-body loss as theorised.
+
+In conclusion this methods yields a surprisingly accurate result with 7.1\% uncertainty considering the experimentation was a rather quick process. However, the evaluation of 70+ CSV-data-files is rather laborious  and could be automated by a program, if this procedure were to be integrated into a scientist's working routine, in order to increase efficiency.
 
 
 
